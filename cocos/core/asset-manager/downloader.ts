@@ -427,8 +427,10 @@ export class Downloader {
         const finale = (err, result) => {
             if (!err) { files.add(id, result); }
             const callbacks = this._downloading.remove(id) as CompleteCallback[];
-            for (let i = 0, l = callbacks.length; i < l; i++) {
-                callbacks[i](err, result);
+            if (callbacks !== undefined) {
+                for (let i = 0, l = callbacks.length; i < l; i++) {
+                    callbacks[i](err, result);
+                }
             }
         };
 

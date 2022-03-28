@@ -776,6 +776,10 @@ export class Layout extends Component {
         this._doLayoutDirty();
     }
 
+    public Resize() {
+        this._resized();
+    }
+
     protected _doLayoutHorizontally (baseWidth: number, rowBreak: boolean, fnPositionY: (...args: any[]) => number, applyChildren: boolean) {
         const trans = this.node._uiProps.uiTransformComp!;
         const layoutAnchor = trans.anchorPoint;

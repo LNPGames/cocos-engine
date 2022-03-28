@@ -1,7 +1,7 @@
 {
     "files.exclude": {
         ".git": true,
-        "node_modules": true,
+        "node_modules": true
     },
     "search.exclude": {
         ".git": true,
@@ -11,11 +11,32 @@
     },
     "typescript.preferences.importModuleSpecifier": "relative",
     "typescript.tsdk": "node_modules/typescript/lib",
-    "eslint.validate": [
-        "javascript",
-        "typescript"
-    ],
+    "eslint.validate": ["javascript", "typescript"],
     "editor.codeActionsOnSave": {
-        "source.fixAll": true,
+        "source.fixAll": true
     },
+    "prettier.embeddedLanguageFormatting": "off",
+    "eslint.enable": false,
+    "editor.formatOnSave": false,
+    "prettier.enable": false,
+    "javascript.format.enable": false,
+    "javascript.format.insertSpaceAfterCommaDelimiter": false,
+    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+    "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+    "javascript.format.insertSpaceAfterSemicolonInForStatements": false,
+    "javascript.format.insertSpaceBeforeAndAfterBinaryOperators": false,
+    "typescript.format.enable": false,
+    "typescript.format.insertSpaceAfterCommaDelimiter": false,
+    "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+    "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+    "typescript.format.insertSpaceAfterSemicolonInForStatements": false,
+    "typescript.format.insertSpaceBeforeAndAfterBinaryOperators": false,
+    "solidity.formatter": "none",
+    "json.format.enable": false,
+    "html.format.enable": false,
+    "thunder-client.saveRequestOnSend": false
 }
