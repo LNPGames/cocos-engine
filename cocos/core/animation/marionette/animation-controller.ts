@@ -59,6 +59,7 @@ export class AnimationController extends Component {
      * ```
      */
     public getVariables () {
+        if(this._graphEval == null) this.start();
         const { _graphEval: graphEval } = this;
         assertIsNonNullable(graphEval);
         return graphEval.getVariables();
@@ -77,6 +78,7 @@ export class AnimationController extends Component {
      * ```
      */
     public setValue (name: string, value: Value) {
+        if(this._graphEval == null) this.start();
         const { _graphEval: graphEval } = this;
         assertIsNonNullable(graphEval);
         graphEval.setValue(name, value);
@@ -89,6 +91,7 @@ export class AnimationController extends Component {
      * @returns 变量当前的值。
      */
     public getValue (name: string) {
+        if(this._graphEval == null) this.start();
         const { _graphEval: graphEval } = this;
         assertIsNonNullable(graphEval);
         return graphEval.getValue(name);
@@ -101,6 +104,7 @@ export class AnimationController extends Component {
      * @returns 当前的状态运作状态对象。
      */
     public getCurrentStateStatus (layer: number) {
+        if(this._graphEval == null) this.start();
         const { _graphEval: graphEval } = this;
         assertIsNonNullable(graphEval);
         return graphEval.getCurrentStateStatus(layer);
@@ -113,6 +117,7 @@ export class AnimationController extends Component {
      * @returns 到动画剪辑运作状态的迭代器。
      */
     public getCurrentClipStatuses (layer: number) {
+        if(this._graphEval == null) this.start();
         const { _graphEval: graphEval } = this;
         assertIsNonNullable(graphEval);
         return graphEval.getCurrentClipStatuses(layer);
@@ -125,6 +130,7 @@ export class AnimationController extends Component {
      * @returns 当前正在进行的过渡，若没有进行任何过渡，则返回 `null`。
      */
     public getCurrentTransition (layer: number) {
+        if(this._graphEval == null) this.start();
         const { _graphEval: graphEval } = this;
         assertIsNonNullable(graphEval);
         return graphEval.getCurrentTransition(layer);
@@ -137,6 +143,7 @@ export class AnimationController extends Component {
      * @returns 下一状态运作状态对象，若未在进行过渡，则返回 `null`。
      */
     public getNextStateStatus (layer: number) {
+        if(this._graphEval == null) this.start();
         const { _graphEval: graphEval } = this;
         assertIsNonNullable(graphEval);
         return graphEval.getNextStateStatus(layer);
@@ -149,6 +156,7 @@ export class AnimationController extends Component {
      * @returns 到下一状态上包含的动画剪辑运作状态的迭代器，若未在进行过渡，则返回一个空的迭代器。
      */
     public getNextClipStatuses (layer: number) {
+        if(this._graphEval == null) this.start();
         const { _graphEval: graphEval } = this;
         assertIsNonNullable(graphEval);
         return graphEval.getNextClipStatuses(layer);
