@@ -37,6 +37,10 @@ export class AnimationController extends Component {
 
     private _graphEval: AnimationGraphEval | null = null;
 
+    onDisable() {
+        this._graphEval = new AnimationGraphEval(this.graph as AnimationGraph, this.node, this);
+    }
+
     public start () {
         if (this.graph && this._graphEval == null) {
             this._graphEval = new AnimationGraphEval(this.graph as AnimationGraph, this.node, this);
