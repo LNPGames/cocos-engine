@@ -69,7 +69,7 @@ export class AttachUtil {
             tm.m12 = bone.worldX;
             tm.m13 = bone.worldY;
             node.matrix = tempMat4;
-            node.scale = nodeScale;
+            node.scale = new Vec3(bone.scaleX, bone.scaleY);
         };
 
         for (const boneIdx of socketNodes.keys()) {
