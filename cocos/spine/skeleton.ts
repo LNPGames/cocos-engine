@@ -704,6 +704,8 @@ export class Skeleton extends Renderable2D {
 
     // IMPLEMENT
     public __preload () {
+        if (this._skeleton != null) return;
+
         super.__preload();
         if (EDITOR) {
             const Flags = CCObject.Flags;
@@ -1015,6 +1017,10 @@ export class Skeleton extends Renderable2D {
      * @return {sp.spine.TrackEntry}
      */
     public setAnimation (trackIndex: number, name: string, loop: boolean) {
+        if (this._skeleton == null){
+            this.__preload();
+        }
+
         this._playTimes = loop ? 0 : 1;
         this._animationName = name;
 
