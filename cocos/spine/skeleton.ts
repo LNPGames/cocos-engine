@@ -208,7 +208,7 @@ export class Skeleton extends Renderable2D {
     }
     set animation (value: string) {
         if (value) {
-            this.setAnimation(0, value, this.loop);
+            this.setAnimation(0, value, this.loop, this.reverse);
             this.markForUpdateRenderData();
         } else if (!this.isAnimationCached()) {
             this.clearTrack(0);
@@ -358,6 +358,19 @@ export class Skeleton extends Renderable2D {
             this._timeScale = value;
         }
     }
+
+    /**
+    * @en The _reverse of this skeleton.
+    * @zh 当前骨骼中所有动画的时间缩放率。
+    */
+   @tooltip('i18n:COMPONENT.skeleton._reverse')
+   @editable
+   get reverse () { return this._reverse; }
+   set reverse (value) {
+       if (value !== this._reverse) {
+           this._reverse = value;
+       }
+   }
 
     /**
      * @en Indicates whether open debug slots.
@@ -559,6 +572,9 @@ export class Skeleton extends Renderable2D {
 
     @serializable
     protected _skeletonData: SkeletonData | null = null;
+
+    @serializable
+    protected _reverse: boolean = false;
 
     /**
      * @en Indicates whether to enable premultiplied alpha.
