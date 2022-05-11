@@ -441,6 +441,7 @@ export class Skeleton extends Renderable2D {
 
     get socketNodes () { return this._socketNodes; }
 
+
     /*
      * @en Enabled batch model, if skeleton is complex, do not enable batch, or will lower performance.
      * @zh 开启合批，如果渲染大量相同纹理，且结构简单的骨骼动画，开启合批可以降低drawcall，否则请不要开启，cpu消耗会上升。
@@ -784,7 +785,7 @@ export class Skeleton extends Renderable2D {
                 if (this._accTime > this._headAniInfo.delay) {
                     const aniInfo = this._headAniInfo;
                     this._headAniInfo = null;
-                    this.setAnimation(0, aniInfo.animationName, aniInfo.loop);
+                    this.setAnimation(0, aniInfo.animationName, aniInfo.loop, false);
                 }
                 return;
             }
@@ -1016,7 +1017,7 @@ export class Skeleton extends Renderable2D {
      * @param {Boolean} loop
      * @return {sp.spine.TrackEntry}
      */
-    public setAnimation (trackIndex: number, name: string, loop: boolean) {
+    public setAnimation (trackIndex: number, name: string, loop: boolean, reverse : boolean = false) {
         if (this._skeleton == null){
             this.__preload();
         }
@@ -1050,7 +1051,7 @@ export class Skeleton extends Renderable2D {
                 logID(7509, name);
                 return null;
             }
-            const res = this._state!.setAnimationWith(trackIndex, animation, loop);
+            const res = this._state!.setAnimationWith(trackIndex, animation, loop, reverse);
             this._state!.apply(this._skeleton);
             return res;
         }

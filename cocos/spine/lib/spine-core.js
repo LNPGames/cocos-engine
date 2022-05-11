@@ -1718,13 +1718,13 @@ var spine;
             }
             this.queue.start(current);
         };
-        AnimationState.prototype.setAnimation = function (trackIndex, animationName, loop) {
+        AnimationState.prototype.setAnimation = function (trackIndex, animationName, loop, reverse) {
             var animation = this.data.skeletonData.findAnimation(animationName);
             if (animation == null)
                 throw new Error("Animation not found: " + animationName);
-            return this.setAnimationWith(trackIndex, animation, loop);
+            return this.setAnimationWith(trackIndex, animation, loop, reverse);
         };
-        AnimationState.prototype.setAnimationWith = function (trackIndex, animation, loop) {
+        AnimationState.prototype.setAnimationWith = function (trackIndex, animation, loop, reverse) {
             if (animation == null)
                 throw new Error("animation cannot be null.");
             var interrupt = true;
@@ -1741,7 +1741,7 @@ var spine;
                 else
                     this.disposeNext(current);
             }
-            var entry = this.trackEntry(trackIndex, animation, loop, current);
+            var entry = this.trackEntry(trackIndex, animation, loop, current, reverse);
             this.setCurrent(trackIndex, entry, interrupt);
             this.queue.drain();
             return entry;
@@ -1760,7 +1760,7 @@ var spine;
                 while (last.next != null)
                     last = last.next;
             }
-            var entry = this.trackEntry(trackIndex, animation, loop, last);
+            var entry = this.trackEntry(trackIndex, animation, loop, last, false);
             if (last == null) {
                 this.setCurrent(trackIndex, entry, true);
                 this.queue.drain();
@@ -1815,12 +1815,13 @@ var spine;
             this.tracks.length = index + 1;
             return null;
         };
-        AnimationState.prototype.trackEntry = function (trackIndex, animation, loop, last) {
+        AnimationState.prototype.trackEntry = function (trackIndex, animation, loop, last, reverse) {
             var entry = this.trackEntryPool.obtain();
             entry.trackIndex = trackIndex;
             entry.animation = animation;
             entry.loop = loop;
             entry.holdPrevious = false;
+            entry.reverse = reverse;
             entry.eventThreshold = 0;
             entry.attachmentThreshold = 0;
             entry.drawOrderThreshold = 0;
@@ -1975,10 +1976,10 @@ var spine;
             if (this.loop) {
                 var duration = this.animationEnd - this.animationStart;
                 if (duration == 0)
-                    return this.animationStart;
-                return (this.trackTime % duration) + this.animationStart;
+                    return this.reverse ? this.animationEnd : this.animationStart;
+                return this.reverse ? this.animationEnd - (this.trackTime % duration) : (this.trackTime % duration) + this.animationStart;
             }
-            return Math.min(this.trackTime + this.animationStart, this.animationEnd);
+            return this.reverse ? Math.max(this.animationEnd - this.trackTime, this.animationStart) : Math.min(this.trackTime + this.animationStart, this.animationEnd);
         };
         TrackEntry.prototype.setAnimationLast = function (animationLast) {
             this.animationLast = animationLast;
