@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 import { Buffer } from './buffer';
 import { DescriptorSetLayout } from './descriptor-set-layout';
@@ -54,7 +51,7 @@ export abstract class DescriptorSet extends GFXObject {
         super(ObjectType.DESCRIPTOR_SET);
     }
 
-    public abstract initialize (info: DescriptorSetInfo): void;
+    public abstract initialize (info: Readonly<DescriptorSetInfo>): void;
 
     public abstract destroy (): void;
 

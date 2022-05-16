@@ -149,6 +149,7 @@ CCClass.fastDefine(
         leftTangent: 0.0,
         leftTangentWeight: 0.0,
         easingMethod: EasingMethod.LINEAR,
+        [editorExtrasTag]: undefined,
     },
 );
 
@@ -288,7 +289,6 @@ function createRealKeyframeValue (params: RealKeyframeValueParameters) {
  * 注意，切线/切线权重/切线权重模式在某些情况下可能是“无意义的”。
  * 无意义意味着这些值可能不会被存储或序列化。
  */
-@ccclass('cc.RealCurve')
 export class RealCurve extends KeyframeCurve<RealKeyframeValue> {
     /**
      * @en
@@ -296,8 +296,8 @@ export class RealCurve extends KeyframeCurve<RealKeyframeValue> {
      * Defaults to `ExtrapolationMode.CLAMP`.
      * @zh
      * 获取或设置此曲线的前向外推模式。
+     * 默认为 `ExtrapolationMode.CLAMP`。
      */
-    @serializable
     public preExtrapolation: ExtrapolationMode = ExtrapolationMode.CLAMP;
 
     /**
@@ -306,15 +306,15 @@ export class RealCurve extends KeyframeCurve<RealKeyframeValue> {
      * Defaults to `ExtrapolationMode.CLAMP`.
      * @zh
      * 获取或设置此曲线的后向外推模式。
+     * 默认为 `ExtrapolationMode.CLAMP`。
      */
-    @serializable
     public postExtrapolation: ExtrapolationMode = ExtrapolationMode.CLAMP;
 
     /**
      * @en
      * Evaluates this curve at specified time.
      * @zh
-     * 求值此曲线在指定时间上的值。
+     * 计算此曲线在指定时间上的值。
      * @param time Input time.
      * @returns Result value.
      */
@@ -393,7 +393,10 @@ export class RealCurve extends KeyframeCurve<RealKeyframeValue> {
     }
 
     /**
+     * @en
      * Adds a keyframe into this curve.
+     * @zh
+     * 添加一个关键帧到此曲线。
      * @param time Time of the keyframe.
      * @param value Value of the keyframe.
      * @returns The index to the new keyframe.
@@ -403,7 +406,10 @@ export class RealCurve extends KeyframeCurve<RealKeyframeValue> {
     }
 
     /**
+     * @en
      * Assigns all keyframes.
+     * @zh
+     * 赋值所有关键帧。
      * @param keyframes An iterable to keyframes. The keyframes should be sorted by their time.
      */
     public assignSorted (keyframes: Iterable<[number, RealKeyframeValueParameters]>): void;
@@ -435,7 +441,10 @@ export class RealCurve extends KeyframeCurve<RealKeyframeValue> {
     }
 
     /**
+     * @en
      * Returns if this curve is constant.
+     * @zh
+     * 返回此曲线是否是常量曲线。
      * @param tolerance The tolerance.
      * @returns Whether it is constant.
      */
@@ -447,6 +456,9 @@ export class RealCurve extends KeyframeCurve<RealKeyframeValue> {
         return this._values.every((frame) => approx(frame.value, firstVal, tolerance));
     }
 
+    /**
+     * @internal
+     */
     public [serializeTag] (output: SerializationOutput, context: SerializationContext) {
         if (!context.toCCON) {
             output.writeThis();
@@ -494,6 +506,9 @@ export class RealCurve extends KeyframeCurve<RealKeyframeValue> {
         }
     }
 
+    /**
+     * @internal
+     */
     public [deserializeTag] (input: SerializationInput, context: DeserializationContext) {
         if (!context.fromCCON) {
             input.readThis();
@@ -539,6 +554,13 @@ export class RealCurve extends KeyframeCurve<RealKeyframeValue> {
         this._values = keyframeValues;
     }
 }
+
+CCClass.fastDefine('cc.RealCurve', RealCurve, {
+    _times: [],
+    _values: [],
+    preExtrapolation: ExtrapolationMode.CLAMP,
+    postExtrapolation: ExtrapolationMode.CLAMP,
+});
 
 const FLAGS_EASING_METHOD_BITS_START = 8;
 const FLAG_EASING_METHOD_MASK = 0xFF << FLAGS_EASING_METHOD_BITS_START; // 8-16 bits

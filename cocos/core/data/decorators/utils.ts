@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module decorator
- */
+
 
 import { DEV } from 'internal:constants';
 import { CCClass } from '../class';
@@ -156,6 +153,7 @@ export function getClassCache (ctor, decoratorName?) {
     return getSubDict(ctor, CACHE_KEY);
 }
 
-export function getSubDict (obj, key) {
+export function getSubDict<T, TKey extends keyof T> (obj: T, key: TKey): NonNullable<T[TKey]> {
+    // @ts-expect-error I don't know how to fix it.
     return obj[key] || (obj[key] = {});
 }

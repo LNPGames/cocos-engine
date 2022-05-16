@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module particle
- */
+
 
 import { ccclass, tooltip, displayOrder, type, formerlySerializedAs, serializable, visible, range } from 'cc.decorator';
 import { Mat4, Quat, Vec2, Vec3, clamp, pingPong, random, randomRange, repeat, toDegree, toRadian } from '../../core/math';
@@ -125,6 +122,8 @@ export default class ShapeModule {
 
     /**
      * @zh 粒子发射器类型 [[ShapeType]]。
+     *
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     @type(ShapeType)
     @formerlySerializedAs('shapeType')

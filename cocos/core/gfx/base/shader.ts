@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 import { GFXObject, ObjectType, ShaderInfo, ShaderStage, UniformBlock, UniformSampler, Attribute } from './define';
 
@@ -61,7 +58,7 @@ export abstract class Shader extends GFXObject {
         super(ObjectType.SHADER);
     }
 
-    public abstract initialize (info: ShaderInfo): void;
+    public abstract initialize (info: Readonly<ShaderInfo>): void;
 
     public abstract destroy (): void;
 }

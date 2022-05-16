@@ -29,9 +29,9 @@ import { Sphere } from '../../geometry';
 import { Color, Mat4, Vec3, Vec2 } from '../../math';
 import { legacyCC } from '../../global-exports';
 import { Enum } from '../../value-types';
-import { ShadowsInfo } from '../../scene-graph/scene-globals';
+import type { ShadowsInfo } from '../../scene-graph/scene-globals';
 import { IMacroPatch } from '../core/pass';
-import { NativeShadow } from './native-scene';
+import { NativeShadow } from '../native-scene';
 import { Shader } from '../../gfx';
 
 /**
@@ -124,6 +124,10 @@ export const PCFType = Enum({
 
 const SHADOW_TYPE_NONE = ShadowType.ShadowMap + 1;
 
+/**
+ * @en The global shadow's configuration of the render scene
+ * @zh 渲染场景的全局阴影配置
+ */
 export class Shadows {
     /**
      * @en MAX_FAR. This is shadow camera max far.
@@ -147,6 +151,18 @@ export class Shadows {
 
     set enabled (val: boolean) {
         this._setEnable(val);
+        this.activate();
+    }
+
+    /**
+     * @en Shadow type.
+     * @zh 阴影类型。
+     */
+    get type (): number {
+        return this._type;
+    }
+    set type (val: number) {
+        this._setType(val);
         this.activate();
     }
 
@@ -196,88 +212,6 @@ export class Shadows {
     }
 
     /**
-     * @en get or set shadow invisible Occlusion Range.
-     * @zh 控制潜在遮挡体产生的范围。
-     */
-    public get invisibleOcclusionRange (): number {
-        return this._invisibleOcclusionRange;
-    }
-    public set invisibleOcclusionRange (val: number) {
-        this._invisibleOcclusionRange = val;
-        if (JSB) {
-            this._nativeObj!.invisibleOcclusionRange = val;
-        }
-    }
-
-    /**
-     * @en get or set shadow distance.
-     * @zh 控制阴影的可视范围。
-     */
-    public get shadowDistance (): number {
-        return this._shadowDistance;
-    }
-    public set shadowDistance (val: number) {
-        this._shadowDistance = val;
-        if (JSB) {
-            this._nativeObj!.shadowDistance = val;
-        }
-    }
-
-    /**
-     * @en Shadow type.
-     * @zh 阴影类型。
-     */
-    get type (): number {
-        return this._type;
-    }
-    set type (val: number) {
-        this._setType(val);
-        this.activate();
-    }
-
-    /**
-     * @en get or set shadow camera near.
-     * @zh 获取或者设置阴影相机近裁剪面。
-     */
-    public get near (): number {
-        return this._near;
-    }
-    public set near (val: number) {
-        this._near = val;
-        if (JSB) {
-            this._nativeObj!.nearValue = val;
-        }
-    }
-
-    /**
-     * @en get or set shadow camera far.
-     * @zh 获取或者设置阴影相机远裁剪面。
-     */
-    public get far (): number {
-        return this._far;
-    }
-    public set far (val: number) {
-        this._far = val;
-        if (JSB) {
-            this._nativeObj!.farValue = val;
-        }
-    }
-
-    /**
-     * @en get or set shadow camera orthoSize.
-     * @zh 获取或者设置阴影相机正交大小。
-     */
-    public get orthoSize (): number {
-        return this._orthoSize;
-    }
-    public set orthoSize (val: number) {
-        this._orthoSize = val;
-        if (JSB) {
-            this._nativeObj!.orthoSize = val;
-        }
-    }
-
-    /**
      * @en get or set shadow camera orthoSize.
      * @zh 获取或者设置阴影纹理大小。
      */
@@ -288,20 +222,6 @@ export class Shadows {
         this._size.set(val);
         if (JSB) {
             this._nativeObj!.size = val;
-        }
-    }
-
-    /**
-     * @en get or set shadow pcf.
-     * @zh 获取或者设置阴影pcf等级。
-     */
-    public get pcf (): number {
-        return this._pcf;
-    }
-    public set pcf (val: number) {
-        this._pcf = val;
-        if (JSB) {
-            this._nativeObj!.pcfType = val;
         }
     }
 
@@ -320,61 +240,9 @@ export class Shadows {
     }
 
     /**
-     * @en get or set shadow bias.
-     * @zh 获取或者设置阴影偏移量。
+     * @en The transform matrix of the light source
+     * @zh 光源的变换矩阵
      */
-    public get bias (): number {
-        return this._bias;
-    }
-    public set bias (val: number) {
-        this._bias = val;
-        if (JSB) {
-            this._nativeObj!.bias = val;
-        }
-    }
-
-    /**
-     * @en get or set normal bias.
-     * @zh 设置或者获取法线偏移。
-     */
-    public get normalBias (): number {
-        return this._normalBias;
-    }
-    public set normalBias (val: number) {
-        this._normalBias = val;
-        if (JSB) {
-            this._nativeObj!.normalBias = val;
-        }
-    }
-
-    /**
-     * @en get or set shadow saturation.
-     * @zh 设置或者获取阴影饱和度。
-     */
-    public get saturation (): number {
-        return this._saturation;
-    }
-    public set saturation (val: number) {
-        this._saturation = val;
-        if (JSB) {
-            this._nativeObj!.saturation = val;
-        }
-    }
-
-    /**
-     * @en get or set fixed area shadow
-     * @zh 是否是固定区域阴影
-     */
-    public get fixedArea (): boolean {
-        return this._fixedArea;
-    }
-    public set fixedArea (val: boolean) {
-        this._fixedArea = val;
-        if (JSB) {
-            this._nativeObj!.fixedArea = val;
-        }
-    }
-
     public get matLight () {
         return this._matLight;
     }
@@ -400,34 +268,48 @@ export class Shadows {
     public maxReceived = 4;
 
     // local set
+    /**
+     * @internal
+     */
     public firstSetCSM = false;
+    /**
+     * @en The far clip plane of the shadow camera
+     * @zh 阴影相机的远裁剪平面
+     */
     public shadowCameraFar = 0;
+    /**
+     * @en Shadow camera's view matrix
+     * @zh 阴影相机的视图矩阵
+     */
     public matShadowView = new Mat4();
+    /**
+     * @en Shadow camera's projection matrix
+     * @zh 阴影相机的投影矩阵
+     */
     public matShadowProj = new Mat4();
+    /**
+     * @en Shadow camera's view projection matrix
+     * @zh 阴影相机的视图投影矩阵
+     */
     public matShadowViewProj = new Mat4();
 
+    protected _enabled = false;
+    protected _type = SHADOW_TYPE_NONE;
+    protected _distance = 0;
     protected _normal = new Vec3(0, 1, 0);
     protected _shadowColor = new Color(0, 0, 0, 76);
+    protected _size: Vec2 = new Vec2(512, 512);
+    protected _shadowMapDirty = false;
+
     protected _matLight = new Mat4();
     protected _material: Material | null = null;
     protected _instancingMaterial: Material | null = null;
-    protected _size: Vec2 = new Vec2(512, 512);
-    protected _enabled = false;
-    protected _distance = 0;
-    protected _type = SHADOW_TYPE_NONE;
-    protected _near = 0.1;
-    protected _far = 10;
-    protected _invisibleOcclusionRange = 200;
-    protected _shadowDistance = 100;
-    protected _orthoSize = 1;
-    protected _pcf = 0;
-    protected _shadowMapDirty = false;
-    protected _bias = 0;
-    protected _normalBias = 0;
-    protected _fixedArea = false;
-    protected _saturation = 0.75;
+
     protected declare _nativeObj: NativeShadow | null;
 
+    /**
+     * @internal
+     */
     get native (): NativeShadow {
         return this._nativeObj!;
     }
@@ -438,6 +320,12 @@ export class Shadows {
         }
     }
 
+    /**
+     * @en Get the shader for the planar shadow with macro patches
+     * @zh 通过指定宏获取平面阴影的 Shader 对象
+     * @param patches The macro patches for the shader
+     * @returns The shader for the planar shadow
+     */
     public getPlanarShader (patches: IMacroPatch[] | null): Shader | null {
         if (!this._material) {
             this._material = new Material();
@@ -450,6 +338,12 @@ export class Shadows {
         return this._material.passes[0].getShaderVariant(patches);
     }
 
+    /**
+     * @en Get the shader which support instancing draw for the planar shadow with macro patches
+     * @zh 通过指定宏获取支持实例化渲染的平面阴影的 Shader 对象
+     * @param patches The macro patches for the shader
+     * @returns The shader for the planar shadow
+     */
     public getPlanarInstanceShader (patches: IMacroPatch[] | null): Shader | null {
         if (!this._instancingMaterial) {
             this._instancingMaterial = new Material();
@@ -478,23 +372,14 @@ export class Shadows {
     }
 
     public initialize (shadowsInfo: ShadowsInfo) {
-        this.near = shadowsInfo.near;
-        this.far = shadowsInfo.far;
-        this.invisibleOcclusionRange = shadowsInfo.invisibleOcclusionRange;
-        this.shadowDistance = shadowsInfo.shadowDistance;
-        this.orthoSize = shadowsInfo.orthoSize;
-        this.size = shadowsInfo.size;
-        this.pcf = shadowsInfo.pcf;
-        this.normal = shadowsInfo.normal;
-        this.distance = shadowsInfo.distance;
-        this.shadowColor = shadowsInfo.shadowColor;
-        this.bias = shadowsInfo.bias;
-        this.normalBias = shadowsInfo.normalBias;
-        this.maxReceived = shadowsInfo.maxReceived;
-        this.fixedArea = shadowsInfo.fixedArea;
         this._setEnable(shadowsInfo.enabled);
         this._setType(shadowsInfo.type);
-        this.saturation = shadowsInfo.saturation;
+
+        this.normal = shadowsInfo.planeDirection;
+        this.distance = shadowsInfo.planeHeight;
+        this.shadowColor = shadowsInfo.shadowColor;
+        this.maxReceived = shadowsInfo.maxReceived;
+        this.size = shadowsInfo.size;
     }
 
     public activate () {

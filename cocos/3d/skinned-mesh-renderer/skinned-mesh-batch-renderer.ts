@@ -22,11 +22,6 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module model
- */
-
 import { EDITOR } from 'internal:constants';
 import {
     ccclass, help, executeInEditMode, executionOrder, menu, tooltip, type, visible, override, serializable, editable,
@@ -72,6 +67,11 @@ export class SkinnedMeshUnit {
     @type(Material)
     public material: Material | null = null;
 
+    /**
+     * @en Local transform matrix
+     * @zh 本地变换矩阵
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     @serializable
     public _localTransform = new Mat4();
 
@@ -209,6 +209,9 @@ export class SkinnedMeshBatchRenderer extends SkinnedMeshRenderer {
         super.onDestroy();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _onMaterialModified (idx: number, material: Material | null) {
         this.cookMaterials();
         super._onMaterialModified(idx, this.getMaterialInstance(idx));

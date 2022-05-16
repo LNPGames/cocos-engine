@@ -1,8 +1,3 @@
-/**
- * @packageDocumentation
- * @module dragonBones
- */
-
 import { EDITOR } from 'internal:constants';
 import { Armature, Bone, EventObject } from '@cocos/dragonbones-js';
 import { ccclass, executeInEditMode, help, menu } from '../core/data/class-decorator';
@@ -156,6 +151,7 @@ export class ArmatureDisplay extends Renderable2D {
     }
     set dragonAsset (value) {
         this._dragonAsset = value;
+        this.destroyRenderData();
         this._refresh();
         if (EDITOR) {
             this._defaultArmatureIndex = 0;
@@ -366,19 +362,6 @@ export class ArmatureDisplay extends Renderable2D {
         this._debugBones = value;
         this._updateDebugDraw();
     }
-    /**
-     * @en Enabled batch model, if skeleton is complex, do not enable batch, or will lower performance.
-     * @zh 开启合批，如果渲染大量相同纹理，且结构简单的骨骼动画，开启合批可以降低drawcall，否则请不要开启，cpu消耗会上升。
-     * @property {Boolean} enableBatch
-     * @default false
-     */
-    // @editable
-    // @tooltip('i18n:COMPONENT.dragon_bones.enabled_batch')
-    // get enableBatch () { return this._enableBatch; }
-    // set enableBatch (value) {
-    //     this._enableBatch = value;
-    //     this._updateBatch();
-    // }
 
     /**
      * @en
@@ -435,9 +418,6 @@ export class ArmatureDisplay extends Renderable2D {
     @serializable
     protected _debugBones = false;
     /* protected */ _debugDraw: Graphics | null = null;
-
-    @serializable
-    public _enableBatch = false;
 
     // DragonBones data store key.
     /**
@@ -519,6 +499,7 @@ export class ArmatureDisplay extends Renderable2D {
         this.initFactory();
         setEnumAttr(this, '_animationIndex', this._enumAnimations);
         setEnumAttr(this, '_defaultArmatureIndex', this._enumArmatures);
+        this._useVertexOpacity = true;
     }
 
     initFactory () {
@@ -603,37 +584,6 @@ export class ArmatureDisplay extends Renderable2D {
             }
             // this.node._static = true;
         }
-    }
-
-    // if change use batch mode, just clear material cache
-    _updateBatch () {
-        // const baseMaterial = this.getMaterial(0);
-        // if (baseMaterial) {
-        //     baseMaterial.define('CC_USE_MODEL', !this.enableBatch);
-        // }
-        this._materialCache = {};
-        this.markForUpdateRenderData();
-    }
-
-    // override base class _updateMaterial to set define value and clear material cache
-    _updateMaterial () {
-        // const baseMaterial = this.getMaterial(0);
-        // if (baseMaterial) {
-        //     baseMaterial.define('CC_USE_MODEL', !this.enableBatch);
-        //     baseMaterial.define('USE_TEXTURE', true);
-
-        //     const srcBlendFactor = this.premultipliedAlpha ? cc.gfx.BLEND_ONE : cc.gfx.BLEND_SRC_ALPHA;
-        //     const dstBlendFactor = cc.gfx.BLEND_ONE_MINUS_SRC_ALPHA;
-
-        //     baseMaterial.setBlend(
-        //         true,
-        //         ccBLEND_FUNC_ADD,
-        //         srcBlendFactor, srcBlendFactor,
-        //         cc.gfx.BLEND_FUNC_ADD,
-        //         dstBlendFactor, dstBlendFactor
-        //     );
-        // }
-        this.markForUpdateRenderData();
     }
 
     __preload () {
@@ -940,8 +890,6 @@ export class ArmatureDisplay extends Renderable2D {
             const aabb = armatureData.aabb;
             this.node._uiProps.uiTransformComp!.setContentSize(aabb.width, aabb.height);
         }
-
-        this._updateBatch();
         this.attachUtil.init(this);
 
         if (this.animationName) {

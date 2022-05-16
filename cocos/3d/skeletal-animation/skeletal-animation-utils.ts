@@ -23,31 +23,27 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @hidden
- */
-
 import { EDITOR, JSB } from 'internal:constants';
-import { AnimationClip } from '../../core/animation/animation-clip';
+import type { AnimationClip } from '../../core/animation/animation-clip';
 import { SkelAnimDataHub } from './skeletal-animation-data-hub';
 import { getWorldTransformUntilRoot } from '../../core/animation/transform-utils';
 import { Mesh } from '../assets/mesh';
 import { Skeleton } from '../assets/skeleton';
 import { AABB } from '../../core/geometry';
 import { Address, BufferUsageBit, Filter, Format, FormatInfos,
-    MemoryUsageBit, Feature, Device, Buffer, BufferInfo, Sampler, SamplerInfo } from '../../core/gfx';
+    MemoryUsageBit, Feature, Device, Buffer, BufferInfo, Sampler, SamplerInfo, FormatFeatureBit } from '../../core/gfx';
 import { Mat4, Quat, Vec3 } from '../../core/math';
 import { UBOSkinningAnimation } from '../../core/pipeline/define';
 import { Node } from '../../core/scene-graph';
 import { ITextureBufferHandle, TextureBufferPool } from '../../core/renderer/core/texture-buffer-pool';
+import { jointTextureSamplerInfo } from '../misc/joint-texture-sampler-info';
 
 // change here and cc-skinning.chunk to use other skinning algorithms
 export const uploadJointData = uploadJointDataLBS;
 export const MINIMUM_JOINT_TEXTURE_SIZE = EDITOR ? 2040 : 480; // have to be multiples of 12
 
 export function selectJointsMediumFormat (device: Device): Format {
-    if (device.hasFeature(Feature.TEXTURE_FLOAT)) {
+    if (device.getFormatFeatures(Format.RGBA32F) & FormatFeatureBit.SAMPLED_TEXTURE) {
         return Format.RGBA32F;
     }
     return Format.RGBA8;
@@ -102,14 +98,7 @@ function roundUpTextureSize (targetLength: number, formatSize: number) {
     return Math.ceil(Math.max(MINIMUM_JOINT_TEXTURE_SIZE * formatScale, targetLength) / 12) * 12;
 }
 
-export const jointTextureSamplerInfo = new SamplerInfo(
-    Filter.POINT,
-    Filter.POINT,
-    Filter.NONE,
-    Address.CLAMP,
-    Address.CLAMP,
-    Address.CLAMP,
-);
+export { jointTextureSamplerInfo };
 
 interface IInternalJointAnimInfo {
     downstream?: Mat4; // downstream default pose, if present

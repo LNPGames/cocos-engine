@@ -32,10 +32,7 @@ const _uuidRegex = /.*[/\\][0-9a-fA-F]{2}[/\\]([0-9a-fA-F-@]{8,}).*/;
 
 export { default as decodeUuid } from '../utils/decode-uuid';
 
-/**
- * @packageDocumentation
- * @module asset-manager
- */
+
 
 /**
  * @en
@@ -80,12 +77,14 @@ export function getUuidFromURL (url: string): string {
  * var url = getUrlWithUuid('fcmR3XADNLgJ1ByKhqcC5Z', {isNative: true, nativeExt: '.png'});
  *
  */
-export function getUrlWithUuid (uuid: string, options?: IOptions | null): string {
+export function getUrlWithUuid (uuid: string, options?: { [k: string]: any, isNative: boolean, nativeExt?: string } | null): string {
     options = options || Object.create(null);
-    options!.__isNative__ = options!.isNative;
-    options!.ext = options!.nativeExt;
-    const bundle = bundles.find((b) => !!b.getAssetInfo(uuid));
 
+    options!.__isNative__ = options!.isNative;
+    if (options!.nativeExt) {
+        options!.ext = options!.nativeExt;
+    }
+    const bundle = bundles.find((b) => !!b.getAssetInfo(uuid));
     if (bundle) {
         options!.bundle = bundle.name;
     }
@@ -102,7 +101,7 @@ export function getUrlWithUuid (uuid: string, options?: IOptions | null): string
  *
  * @method isScene
  * @param {*} asset - asset
- * @returns {boolean} - whether or not type is cc.SceneAsset
+ * @returns {boolean} - whether or not type is SceneAsset
  *
  */
 export function isScene (asset) {
@@ -146,7 +145,7 @@ export function transform (input: Request, options?: IOptions | null): string | 
         for (const item of subTask.output) {
             item.recycle();
         }
-        error(e.message, e.stack);
+        error((e as Error).message, (e as Error).stack);
     }
     subTask.recycle();
     return urls.length > 1 ? urls : urls[0];

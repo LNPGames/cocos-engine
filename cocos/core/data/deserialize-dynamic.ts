@@ -24,10 +24,6 @@
  THE SOFTWARE.
 */
 
-/**
- * @hidden
- */
-
 import { EDITOR, TEST, DEV, DEBUG, JSB, PREVIEW, SUPPORT_JIT } from 'internal:constants';
 import { legacyCC } from '../global-exports';
 import * as js from '../utils/js';
@@ -578,7 +574,6 @@ class _Deserializer {
                 if (DEBUG) {
                     error(`Deserialize ${klass.name} failed, ${(e as { stack: string; }).stack}`);
                 }
-                this._reportMissingClass(type);
                 const obj = createObject(MissingScript);
                 this._deserializeInto(value, obj, MissingScript);
                 return obj;
@@ -667,17 +662,13 @@ class _Deserializer {
 
                     const rawDeserialize: CompiledDeserializeFn = deserialize;
                     deserialize = function (deserializer: _Deserializer,
-                                            object: Record<string, unknown>,
-                                            deserialized: Record<string, unknown>,
-                                            constructor: AnyFunction) {
-                        try {
-                            if (!JSON.parse(JSON.stringify(deserialized._$erialized))) {
-                                error(`Unable to load previously serialized data. ${JSON.stringify(deserialized)}`);
-                            }
-                        } catch (e) {
-                            error(`Error when checking MissingScript 7, ${e}`);
-                        }
+                        object: Record<string, unknown>,
+                        deserialized: Record<string, unknown>,
+                        constructor: AnyFunction) {
                         rawDeserialize(deserializer, object, deserialized, constructor);
+                        if (!object._$erialized) {
+                            error(`Unable to stash previously serialized data. ${JSON.stringify(deserialized)}`);
+                        }
                     };
                 }
             } catch (e) {

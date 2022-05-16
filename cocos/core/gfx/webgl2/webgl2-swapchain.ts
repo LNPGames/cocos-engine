@@ -25,7 +25,8 @@
 
 import { EDITOR } from 'internal:constants';
 import { systemInfo } from 'pal/system-info';
-import { macro, warnID, warn, debug } from '../../platform';
+import { warnID, warn, debug } from '../../platform/debug';
+import { macro } from '../../platform/macro';
 import { WebGL2StateCache } from './webgl2-state-cache';
 import { WebGL2Texture } from './webgl2-texture';
 import { Format, TextureInfo, TextureFlagBit, TextureType,
@@ -152,7 +153,7 @@ export class WebGL2Swapchain extends Swapchain {
     private _webGL2ContextLostHandler: ((event: Event) => void) | null = null;
     private _extensions: IWebGL2Extensions | null = null;
 
-    public initialize (info: SwapchainInfo) {
+    public initialize (info: Readonly<SwapchainInfo>) {
         this._canvas = info.windowHandle;
 
         this._webGL2ContextLostHandler = this._onWebGLContextLost.bind(this);

@@ -22,10 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
-/**
- * @packageDocumentation
- * @module asset-manager
- */
+
 import { Asset } from '..';
 import { IMemoryImageSource } from '../assets/image-asset';
 import { js } from '../utils';
@@ -132,10 +129,10 @@ export type ParseHandler = (file: any, options: IDownloadParseOptions, onComplet
 
 /**
  * @en
- * Parse the downloaded file, it's a singleton, all member can be accessed with `cc.assetManager.parser`
+ * Parse the downloaded file, it's a singleton, all member can be accessed with `assetManager.parser`
  *
  * @zh
- * 解析已下载的文件，parser 是一个单例, 所有成员能通过 `cc.assetManaager.parser` 访问
+ * 解析已下载的文件，parser 是一个单例, 所有成员能通过 `assetManaager.parser` 访问
  *
  */
 export class Parser {
@@ -217,7 +214,7 @@ export class Parser {
                 throw new Error('Invalid magic number in PVR header');
             }
         } catch (e) {
-            err = e;
+            err = e as Error;
         }
         onComplete(err, out);
     }
@@ -245,7 +242,7 @@ export class Parser {
                 format: 0,
             };
         } catch (e) {
-            err = e;
+            err = e as Error;
         }
         onComplete(err, out);
     }
@@ -273,9 +270,12 @@ export class Parser {
 
             const format = getASTCFormat(xdim, ydim);
 
-            const xsize = header[ASTC_HEADER_SIZE_X_BEGIN] + (header[ASTC_HEADER_SIZE_X_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_X_BEGIN + 2] << 16);
-            const ysize = header[ASTC_HEADER_SIZE_Y_BEGIN] + (header[ASTC_HEADER_SIZE_Y_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_Y_BEGIN + 2] << 16);
-            const zsize = header[ASTC_HEADER_SIZE_Z_BEGIN] + (header[ASTC_HEADER_SIZE_Z_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_Z_BEGIN + 2] << 16);
+            const xsize = header[ASTC_HEADER_SIZE_X_BEGIN] + (header[ASTC_HEADER_SIZE_X_BEGIN + 1] << 8)
+                + (header[ASTC_HEADER_SIZE_X_BEGIN + 2] << 16);
+            const ysize = header[ASTC_HEADER_SIZE_Y_BEGIN] + (header[ASTC_HEADER_SIZE_Y_BEGIN + 1] << 8)
+                + (header[ASTC_HEADER_SIZE_Y_BEGIN + 2] << 16);
+            const zsize = header[ASTC_HEADER_SIZE_Z_BEGIN] + (header[ASTC_HEADER_SIZE_Z_BEGIN + 1] << 8)
+                + (header[ASTC_HEADER_SIZE_Z_BEGIN + 2] << 16);
 
             // buffer = buffer.slice(ASTC_HEADER_LENGTH, buffer.byteLength);
             const astcData = new Uint8Array(buffer, ASTC_HEADER_LENGTH);
@@ -288,7 +288,7 @@ export class Parser {
                 format,
             };
         } catch (e) {
-            err = e;
+            err = e as Error;
         }
         onComplete(err, out);
     }
@@ -310,7 +310,7 @@ export class Parser {
         try {
             result = deserialize(file, options);
         } catch (e) {
-            err = e;
+            err = e as Error;
         }
         onComplete(err, result);
     }
@@ -334,7 +334,8 @@ export class Parser {
      *
      * @example
      * parser.register('.tga', (file, options, onComplete) => onComplete(null, null));
-     * parser.register({'.tga': (file, options, onComplete) => onComplete(null, null), '.ext': (file, options, onComplete) => onComplete(null, null)});
+     * parser.register({'.tga': (file, options, onComplete) => onComplete(null, null),
+     *                  '.ext': (file, options, onComplete) => onComplete(null, null)});
      *
      */
     public register (type: string, handler: ParseHandler): void;

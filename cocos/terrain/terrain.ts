@@ -23,10 +23,6 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module terrain
- */
 import { ccclass, disallowMultiple, executeInEditMode, help, visible, type, serializable, editable, disallowAnimation } from 'cc.decorator';
 import { JSB } from 'internal:constants';
 import { builtinResMgr } from '../core/builtin';
@@ -179,12 +175,29 @@ export class TerrainLayer {
  * @zh 地形渲染组件
  */
 class TerrainRenderable extends RenderableComponent {
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _model: scene.Model | null = null;
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _meshData: RenderingSubMesh | null = null;
-
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _brushPass: Pass | null = null;
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _brushMaterial: Material | null = null;
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _currentMaterial: Material | null = null;
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _currentMaterialLayers = 0;
 
     public destroy () {
@@ -197,6 +210,9 @@ class TerrainRenderable extends RenderableComponent {
         return super.destroy();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _destroyModel () {
         // this._invalidMaterial();
         if (this._model != null) {
@@ -205,6 +221,9 @@ class TerrainRenderable extends RenderableComponent {
         }
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _invalidMaterial () {
         if (this._currentMaterial == null) {
             return;
@@ -219,9 +238,12 @@ class TerrainRenderable extends RenderableComponent {
         }
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _updateMaterial (block: TerrainBlock, init: boolean) {
         if (this._meshData == null || this._model == null) {
-            return;
+            return false;
         }
 
         const nLayers = block.getMaxLayer();
@@ -256,9 +278,15 @@ class TerrainRenderable extends RenderableComponent {
             this._currentMaterialLayers = nLayers;
             this._model.enabled = true;
             this._model.receiveShadow = block.getTerrain().receiveShadow;
+            return true;
         }
+
+        return false;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _onMaterialModified (idx: number, mtl: Material|null) {
         if (this._model == null) {
             return;
@@ -760,7 +788,7 @@ export class TerrainBlock {
     public _getMaterialDefines (nlayers: number): MacroRecord {
         return {
             LAYERS: nlayers + 1,
-            USE_LIGHTMAP: this.lightmap !== null ? 1 : 0,
+            CC_USE_LIGHTMAP: this.lightmap !== null ? 1 : 0,
             USE_NORMALMAP: this._terrain.useNormalMap ? 1 : 0,
             USE_PBR: this._terrain.usePBR ? 1 : 0,
             // CC_RECEIVE_SHADOW: this._terrain.receiveShadow ? 1 : 0,
@@ -772,7 +800,12 @@ export class TerrainBlock {
     }
 
     public _updateMaterial (init: boolean) {
-        this._renderable._updateMaterial(this, init);
+        if (this._renderable._updateMaterial(this, init)) {
+            // Need set wrap mode clamp to border
+            if (this.lightmap !== null) {
+                this.lightmap.setWrapMode(WrapMode.CLAMP_TO_BORDER, WrapMode.CLAMP_TO_BORDER);
+            }
+        }
     }
 
     public _updateHeight () {
@@ -831,11 +864,17 @@ export class TerrainBlock {
         this._weightMap.uploadData(weightData);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _updateLightmap (info: TerrainBlockLightmapInfo) {
         this._lightmapInfo = info;
         this._invalidMaterial();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _updateLod () {
         const key = new TerrainLodKey();
         key.level = this._lodLevel;
@@ -884,6 +923,9 @@ export class TerrainBlock {
         this._updateIndexBuffer();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _resetLod () {
         const key = new TerrainLodKey();
         key.level = 0;
@@ -900,6 +942,9 @@ export class TerrainBlock {
         this._updateIndexBuffer();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _updateIndexBuffer () {
         if (this._renderable._meshData === null) {
             return;
@@ -1023,7 +1068,7 @@ export class TerrainBlock {
         }
     }
 
-    private _buildVertexData(vertexData: Float32Array) {
+    private _buildVertexData (vertexData: Float32Array) {
         let index = 0;
         for (let j = 0; j < TERRAIN_BLOCK_VERTEX_COMPLEXITY; ++j) {
             for (let i = 0; i < TERRAIN_BLOCK_VERTEX_COMPLEXITY; ++i) {
@@ -1044,7 +1089,7 @@ export class TerrainBlock {
         }
     }
 
-    private _buildBoundingBox() {
+    private _buildBoundingBox () {
         this._bbMin.set(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
         this._bbMax.set(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
         for (let j = 0; j < TERRAIN_BLOCK_VERTEX_COMPLEXITY; ++j) {
@@ -1179,6 +1224,9 @@ export class Terrain extends Component {
         }
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public get _asset () {
         return this.__asset;
     }
@@ -1409,6 +1457,9 @@ export class Terrain extends Component {
             this._blocks[i].destroy();
         }
         this._blocks = [];
+
+        // reset lightmap
+        this._resetLightmap(false);
 
         // build layer buffer
         this._rebuildLayerBuffer(info);
@@ -1725,6 +1776,9 @@ export class Terrain extends Component {
         return h;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _setNormal (i: number, j: number, n: Vec3) {
         const index = j * this.vertexCount[0] + i;
 
@@ -2035,6 +2089,9 @@ export class Terrain extends Component {
         return position;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _getSharedIndexBuffer () {
         if (this._sharedIndexBuffer == null) {
             // initialize shared index buffer
@@ -2051,10 +2108,16 @@ export class Terrain extends Component {
         return this._sharedIndexBuffer;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _getIndexData (key: TerrainLodKey) {
         return this._lod.getIndexData(key);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _resetLightmap (enble: boolean) {
         this._lightmapInfos.length = 0;
         if (enble) {
@@ -2064,6 +2127,9 @@ export class Terrain extends Component {
         }
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _updateLightmap (blockId: number, tex: Texture2D|null, uOff: number, vOff: number, uScale: number, vScale: number) {
         this._lightmapInfos[blockId].texture = tex;
         this._lightmapInfos[blockId].UOff = uOff;
@@ -2073,11 +2139,17 @@ export class Terrain extends Component {
         this._blocks[blockId]._updateLightmap(this._lightmapInfos[blockId]);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _getLightmapInfo (i: number, j: number) {
         const index = j * this._blockCount[0] + i;
         return index < this._lightmapInfos.length ? this._lightmapInfos[index] : null;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _calcNormal (x: number, z: number) {
         let flip = 1;
         const here = this.getPosition(x, z);
@@ -2110,6 +2182,9 @@ export class Terrain extends Component {
         return normal;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _buildNormals () {
         let index = 0;
         for (let y = 0; y < this.vertexCount[1]; ++y) {
@@ -2130,7 +2205,7 @@ export class Terrain extends Component {
         }
 
         const terrainAsset = this.__asset;
-        if (this._buitinAsset != terrainAsset) {
+        if (this._buitinAsset !== terrainAsset) {
             this._buitinAsset = terrainAsset;
         }
 
@@ -2335,8 +2410,8 @@ export class Terrain extends Component {
         const sampleOldWeight = (_x: number, _y: number, _xOff: number, _yOff: number, _weights: Uint8Array) => {
             const ix0 = Math.floor(_x);
             const iz0 = Math.floor(_y);
-            const ix1 = ix0 + 1;
-            const iz1 = iz0 + 1;
+            const ix1 = Math.min(ix0 + 1, oldWeightMapSize - 1);
+            const iz1 = Math.min(iz0 + 1, oldWeightMapSize - 1);
             const dx = _x - ix0;
             const dz = _y - iz0;
 

@@ -1,8 +1,3 @@
-/**
- * @packageDocumentation
- * @module dragonBones
- */
-
 import { Armature, BlendMode } from '@cocos/dragonbones-js';
 import { Color, Mat4, Node, Texture2D, Vec3, director } from '../../core';
 import { BlendFactor } from '../../core/gfx';
@@ -94,8 +89,6 @@ function _getSlotMaterial (tex: TextureBase | null, blendMode: BlendMode) {
         dst = BlendFactor.ONE_MINUS_SRC_ALPHA;
         break;
     }
-
-    // const useModel = !_comp!.enableBatch;
     _comp!.setBlendHash();
     return _comp!.getMaterialForBlend(src, dst);
 }
@@ -420,17 +413,12 @@ function updateComponentRenderData (comp: ArmatureDisplay, batcher: Batcher2D) {
     _nodeR = nodeColor.r / 255;
     _nodeG = nodeColor.g / 255;
     _nodeB = nodeColor.b / 255;
-    _nodeA = nodeColor.a / 255;
+    _nodeA = comp.node._uiProps.opacity;
     if (nodeColor._val !== 0xffffffff) {
         _handleVal |= NEED_COLOR;
     }
 
     let worldMat: Mat4 | undefined;
-    if (_comp._enableBatch) {
-        worldMat = _node.worldMatrix as Mat4;
-        _mustFlush = false;
-        _handleVal |= NEED_BATCH;
-    }
 
     _vertexFloatCount = 0;
     _vertexOffset = 0;

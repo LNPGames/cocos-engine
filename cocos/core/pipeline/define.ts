@@ -23,18 +23,16 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module pipeline
- */
+
 
 import { Pass } from '../renderer/core/pass';
 import { Model } from '../renderer/scene/model';
 import { SubModel } from '../renderer/scene/submodel';
 import { Layers } from '../scene-graph/layers';
 import { legacyCC } from '../global-exports';
-import { BindingMappingInfo, DescriptorType, Type, ShaderStageFlagBit, UniformStorageBuffer,
-    DescriptorSetLayoutBinding, Uniform, UniformBlock, UniformSamplerTexture, UniformStorageImage, Device, Feature, API } from '../gfx';
+import { BindingMappingInfo, DescriptorType, Type, ShaderStageFlagBit, UniformStorageBuffer, DescriptorSetLayoutBinding,
+    Uniform, UniformBlock, UniformSamplerTexture, UniformStorageImage, Device, FormatFeatureBit, Format,
+} from '../gfx';
 
 export const PIPELINE_FLOW_MAIN = 'MainFlow';
 export const PIPELINE_FLOW_FORWARD = 'ForwardFlow';
@@ -143,12 +141,14 @@ export enum ModelLocalBindings {
     SAMPLER_LIGHTMAP,
     SAMPLER_SPRITE,
     SAMPLER_REFLECTION,
+
     STORAGE_REFLECTION,
 
     COUNT,
 }
 const LOCAL_UBO_COUNT = ModelLocalBindings.SAMPLER_JOINTS;
-const LOCAL_SAMPLER_COUNT = ModelLocalBindings.COUNT - LOCAL_UBO_COUNT;
+const LOCAL_SAMPLER_COUNT = ModelLocalBindings.STORAGE_REFLECTION - LOCAL_UBO_COUNT;
+const LOCAL_STORAGE_IMAGE_COUNT = ModelLocalBindings.COUNT - LOCAL_UBO_COUNT - LOCAL_SAMPLER_COUNT;
 
 export enum SetIndex {
     GLOBAL,
@@ -156,10 +156,16 @@ export enum SetIndex {
     LOCAL,
 }
 // parameters passed to GFX Device
-export const bindingMappingInfo = new BindingMappingInfo();
-bindingMappingInfo.bufferOffsets = [0, GLOBAL_UBO_COUNT + LOCAL_UBO_COUNT, GLOBAL_UBO_COUNT];
-bindingMappingInfo.samplerOffsets = [-GLOBAL_UBO_COUNT, GLOBAL_SAMPLER_COUNT + LOCAL_SAMPLER_COUNT, GLOBAL_SAMPLER_COUNT - LOCAL_UBO_COUNT];
-bindingMappingInfo.flexibleSet = 1;
+export const bindingMappingInfo = new BindingMappingInfo(
+    [GLOBAL_UBO_COUNT, 0, LOCAL_UBO_COUNT],         // Uniform Buffer Counts
+    [GLOBAL_SAMPLER_COUNT, 0, LOCAL_SAMPLER_COUNT], // Combined Sampler Texture Counts
+    [0, 0, 0],                                      // Sampler Counts
+    [0, 0, 0],                                      // Texture Counts
+    [0, 0, 0],                                      // Storage Buffer Counts
+    [0, 0, LOCAL_STORAGE_IMAGE_COUNT],              // Storage Image Counts
+    [0, 0, 0],                                      // Subpass Input Counts
+    [0, 2, 1],                                      // Set Order Indices
+);
 
 /**
  * @en The global uniform buffer object
@@ -279,7 +285,7 @@ globalDescriptorSetLayout.bindings[UBOShadow.BINDING] = UBOShadow.DESCRIPTOR;
 
 /**
  * @en The sampler for Main light shadow map
- * @zn 主光源阴影纹理采样器
+ * @zh 主光源阴影纹理采样器
  */
 const UNIFORM_SHADOWMAP_NAME = 'cc_shadowMap';
 export const UNIFORM_SHADOWMAP_BINDING = PipelineGlobalBindings.SAMPLER_SHADOWMAP;
@@ -304,7 +310,7 @@ globalDescriptorSetLayout.bindings[UNIFORM_DIFFUSEMAP_BINDING] = UNIFORM_DIFFUSE
 
 /**
  * @en The sampler for spot light shadow map
- * @zn 聚光灯阴影纹理采样器
+ * @zh 聚光灯阴影纹理采样器
  */
 const UNIFORM_SPOT_LIGHTING_MAP_TEXTURE_NAME = 'cc_spotLightingMap';
 export const UNIFORM_SPOT_LIGHTING_MAP_TEXTURE_BINDING = PipelineGlobalBindings.SAMPLER_SPOT_LIGHTING_MAP;
@@ -321,7 +327,8 @@ export class UBOLocal {
     public static readonly MAT_WORLD_OFFSET = 0;
     public static readonly MAT_WORLD_IT_OFFSET = UBOLocal.MAT_WORLD_OFFSET + 16;
     public static readonly LIGHTINGMAP_UVPARAM = UBOLocal.MAT_WORLD_IT_OFFSET + 16;
-    public static readonly COUNT = UBOLocal.LIGHTINGMAP_UVPARAM + 4;
+    public static readonly LOCAL_SHADOW_BIAS = UBOLocal.LIGHTINGMAP_UVPARAM + 4;
+    public static readonly COUNT = UBOLocal.LOCAL_SHADOW_BIAS + 4;
     public static readonly SIZE = UBOLocal.COUNT * 4;
 
     public static readonly NAME = 'CCLocal';
@@ -331,6 +338,7 @@ export class UBOLocal {
         new Uniform('cc_matWorld', Type.MAT4, 1),
         new Uniform('cc_matWorldIT', Type.MAT4, 1),
         new Uniform('cc_lightingMapUVParam', Type.FLOAT4, 1),
+        new Uniform('cc_localShadowBias', Type.FLOAT4, 1),
     ], 1);
 }
 localDescriptorSetLayout.layouts[UBOLocal.NAME] = UBOLocal.LAYOUT;
@@ -593,23 +601,21 @@ export const CAMERA_EDITOR_MASK = Layers.makeMaskExclude([Layers.BitMask.UI_2D, 
 export const MODEL_ALWAYS_MASK = Layers.Enum.ALL;
 
 /**
- * @en Does the device support half float texture? (for both color attachment and sampling)
- * @zh 当前设备是否支持半浮点贴图？（颜色输出和采样）
+ * @en Does the device support single-channeled half float texture? (for both color attachment and sampling)
+ * @zh 当前设备是否支持单通道半浮点贴图？（颜色输出和采样）
  */
-export function supportsHalfFloatTexture (device: Device) {
-    return device.hasFeature(Feature.COLOR_HALF_FLOAT)
-     && device.hasFeature(Feature.TEXTURE_HALF_FLOAT)
-     && !(device.gfxAPI === API.WEBGL); // wegl 1  Single-channel float type is not supported under webgl1, so it is excluded
+export function supportsR16HalfFloatTexture (device: Device) {
+    return (device.getFormatFeatures(Format.R16F) & (FormatFeatureBit.RENDER_TARGET | FormatFeatureBit.SAMPLED_TEXTURE))
+        === (FormatFeatureBit.RENDER_TARGET | FormatFeatureBit.SAMPLED_TEXTURE);
 }
 
 /**
- * @en Does the device support half float texture? (for both color attachment and sampling)
- * @zh 当前设备是否支持半浮点贴图？（颜色输出和采样）
+ * @en Does the device support single-channeled float texture? (for both color attachment and sampling)
+ * @zh 当前设备是否支持单通道浮点贴图？（颜色输出和采样）
  */
-export function supportsFloatTexture (device: Device) {
-    return device.hasFeature(Feature.COLOR_FLOAT)
-     && device.hasFeature(Feature.TEXTURE_FLOAT)
-     && !(device.gfxAPI === API.WEBGL); // wegl 1  Single-channel float type is not supported under webgl1, so it is excluded
+export function supportsR32FloatTexture (device: Device) {
+    return (device.getFormatFeatures(Format.R32F) & (FormatFeatureBit.RENDER_TARGET | FormatFeatureBit.SAMPLED_TEXTURE))
+        === (FormatFeatureBit.RENDER_TARGET | FormatFeatureBit.SAMPLED_TEXTURE);
 }
 
 /* eslint-enable max-len */

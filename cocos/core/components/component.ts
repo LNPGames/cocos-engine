@@ -24,23 +24,20 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module component
- */
+
 
 import { ccclass, tooltip, displayName, type, serializable, disallowAnimation } from 'cc.decorator';
-import { EDITOR, TEST, DEV } from 'internal:constants';
+import { EDITOR, TEST } from 'internal:constants';
 import { Script } from '../assets/scripts';
 import { CCObject } from '../data/object';
 import IDGenerator from '../utils/id-generator';
 import { getClassName, value } from '../utils/js';
-import { RenderScene } from '../renderer/scene/render-scene';
+import { RenderScene } from '../renderer/core/render-scene';
 import { Rect } from '../math';
 import * as RF from '../data/utils/requiring-frame';
 import { Node } from '../scene-graph';
 import { legacyCC } from '../global-exports';
-import { errorID, warnID, assertID, error } from '../platform/debug';
+import { errorID, warnID, assertID } from '../platform/debug';
 import { CompPrefabInfo } from '../utils/prefab/prefab-info';
 
 const idGenerator = new IDGenerator('Comp');
@@ -95,6 +92,9 @@ class Component extends CCObject {
         return this._id;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     @displayName('Script')
     @type(Script)
     @tooltip('i18n:INSPECTOR.component.script')
@@ -152,12 +152,15 @@ class Component extends CCObject {
      * import { log } from 'cc';
      * log(this._isOnLoadCalled > 0);
      * ```
+     *
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     get _isOnLoadCalled () {
         return this._objFlags & IsOnLoadCalled;
     }
 
     public static system = null;
+
     /**
      * @en The node this component is attached to. A component is always attached to a node.
      * @zh 该组件被附加到的节点。组件总会附加到一个节点。
@@ -171,32 +174,32 @@ class Component extends CCObject {
     public node: Node = NullNode;
 
     /**
-     * @private
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     @serializable
     public _enabled = true;
 
     /**
-     * @private
+     * @internal
      */
     @serializable
     public __prefab: CompPrefabInfo | null = null;
 
     /**
-     * @private
+     * @internal
      */
     public _sceneGetter: null | (() => RenderScene) = null;
 
     /**
      * For internal usage.
-     * @private
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _id: string = idGenerator.getNewId();
 
     // private __scriptUuid = '';
 
     /**
-     * @private
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _getRenderScene (): RenderScene {
         if (this._sceneGetter) {
@@ -373,6 +376,9 @@ class Component extends CCObject {
         return false;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _onPreDestroy () {
         // Schedules
         this.unscheduleAllCallbacks();
@@ -390,6 +396,9 @@ class Component extends CCObject {
         this.node._removeComponent(this);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _instantiate (cloned?: Component) {
         if (!cloned) {
             cloned = legacyCC.instantiate._clone(this, this);

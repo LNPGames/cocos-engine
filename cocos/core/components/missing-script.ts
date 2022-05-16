@@ -24,10 +24,7 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module component
- */
+
 
 import { ccclass, inspector, editorOnly, serializable, editable } from 'cc.decorator';
 import { EDITOR } from 'internal:constants';
@@ -71,6 +68,9 @@ export default class MissingScript extends Component {
     }
 
     // the serialized data for original script object
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     @serializable
     @editorOnly
     public _$erialized = null;

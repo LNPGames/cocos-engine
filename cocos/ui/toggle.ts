@@ -24,11 +24,6 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module ui
- */
-
 import { ccclass, help, requireComponent, executionOrder, menu, tooltip, displayOrder, type, serializable } from 'cc.decorator';
 import { EDITOR } from 'internal:constants';
 import { EventHandler as ComponentEventHandler } from '../core/components/component-event-handler';
@@ -103,6 +98,9 @@ export class Toggle extends Button {
         }
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     get _toggleContainer () {
         const parent = this.node.parent!;
         if (legacyCC.Node.isNode(parent)) {

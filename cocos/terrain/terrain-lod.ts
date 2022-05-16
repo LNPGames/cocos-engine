@@ -62,9 +62,21 @@ export class TerrainLod {
         return i * (TERRAIN_LOD_LEVELS * TERRAIN_LOD_LEVELS) + j * TERRAIN_LOD_LEVELS + k;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _bodyIndexPool: TerrainIndexPool[];
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _connecterIndexPool: TerrainIndexPool[];
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _indexMap: TerrainIndexData[] = [];
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _indexBuffer: Uint16Array = new Uint16Array();
 
     constructor () {

@@ -24,11 +24,6 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module ui
- */
-
 import { ccclass, help, executeInEditMode, executionOrder, menu, requireComponent, tooltip, displayOrder, type, serializable } from 'cc.decorator';
 import { EDITOR, JSB, MINIGAME, RUNTIME_BASED } from 'internal:constants';
 import { UITransform } from '../../2d/framework';
@@ -94,6 +89,10 @@ export class EditBox extends Component {
     set string (value) {
         if (this._maxLength >= 0 && value.length >= this._maxLength) {
             value = value.slice(0, this._maxLength);
+        }
+
+        if (this._string === value) {
+            return;
         }
 
         this._string = value;
@@ -209,6 +208,10 @@ export class EditBox extends Component {
     }
 
     set inputFlag (value) {
+        if (this._inputFlag === value) {
+            return;
+        }
+
         this._inputFlag = value;
         this._updateString(this._string);
     }
@@ -355,7 +358,13 @@ export class EditBox extends Component {
     @tooltip('i18n:editbox.editing_return')
     public editingReturn: ComponentEventHandler[] = [];
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _impl: EditBoxImplBase | null = null;
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _background: Sprite | null = null;
 
     @serializable
@@ -457,16 +466,25 @@ export class EditBox extends Component {
         return false;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _editBoxEditingDidBegan () {
         ComponentEventHandler.emitEvents(this.editingDidBegan, this);
         this.node.emit(EventType.EDITING_DID_BEGAN, this);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _editBoxEditingDidEnded () {
         ComponentEventHandler.emitEvents(this.editingDidEnded, this);
         this.node.emit(EventType.EDITING_DID_ENDED, this);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _editBoxTextChanged (text: string) {
         text = this._updateLabelStringStyle(text, true);
         this.string = text;
@@ -474,16 +492,25 @@ export class EditBox extends Component {
         this.node.emit(EventType.TEXT_CHANGED, this);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _editBoxEditingReturn () {
         ComponentEventHandler.emitEvents(this.editingReturn, this);
         this.node.emit(EventType.EDITING_RETURN, this);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _showLabels () {
         this._isLabelVisible = true;
         this._updateLabels();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _hideLabels () {
         this._isLabelVisible = false;
         if (this._textLabel) {
@@ -589,7 +616,6 @@ export class EditBox extends Component {
         // update
         const transform = this._placeholderLabel!.node._uiProps.uiTransformComp;
         transform!.setAnchorPoint(0, 1);
-        placeholderLabel.overflow = Label.Overflow.CLAMP;
         if (this._inputMode === InputMode.ANY) {
             placeholderLabel.verticalAlign = VerticalTextAlignment.TOP;
             placeholderLabel.enableWrapText = true;

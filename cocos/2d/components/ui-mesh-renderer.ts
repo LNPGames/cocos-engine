@@ -24,16 +24,12 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module ui
- */
 
-import { ccclass, help, executionOrder, menu } from 'cc.decorator';
+
+import { ccclass, help, executionOrder, menu, executeInEditMode } from 'cc.decorator';
 import { RenderableComponent } from '../../core/components/renderable-component';
 import { RenderPriority } from '../../core/pipeline/define';
 import { IBatcher } from '../renderer/i-batcher';
-import { scene } from '../../core/renderer';
 import { Stage } from '../renderer/stencil-manager';
 import { Component } from '../../core/components';
 import { legacyCC } from '../../core/global-exports';
@@ -42,19 +38,18 @@ import { legacyCC } from '../../core/global-exports';
  * @en
  * The component of model.
  * When you place particles or models in the UI, you must add this component to render.
- * The component must be placed on a node with the [[MeshRenderer]] or the [[Particle]].
+ * The component must be placed on a node with the [[MeshRenderer]] or the [[ParticleSystem]].
  *
  * @zh
  * UI 模型基础组件。
- * 当你在 UI 中放置模型或者粒子的时候，必须添加该组件才能渲染。该组件必须放置在带有 [[MeshRenderer]] 或者 [[Particle]] 组件的节点上。
+ * 当你在 UI 中放置模型或者粒子的时候，必须添加该组件才能渲染。该组件必须放置在带有 [[MeshRenderer]] 或者 [[ParticleSystem]] 组件的节点上。
  */
 @ccclass('cc.UIMeshRenderer')
 @help('i18n:cc.UIMeshRenderer')
 @executionOrder(110)
 @menu('UI/UIMeshRenderer')
+@executeInEditMode
 export class UIMeshRenderer extends Component {
-    private _models: scene.Model[] | null = null;
-
     public get modelComponent () {
         return this._modelComponent;
     }
@@ -73,10 +68,7 @@ export class UIMeshRenderer extends Component {
         this._modelComponent = this.getComponent('cc.RenderableComponent') as RenderableComponent;
         if (!this._modelComponent) {
             console.warn(`node '${this.node && this.node.name}' doesn't have any renderable component`);
-            return;
         }
-
-        this._models = this._modelComponent._collectModels();
     }
 
     public onDestroy () {
@@ -89,7 +81,6 @@ export class UIMeshRenderer extends Component {
         }
 
         this._modelComponent._sceneGetter = null;
-        this._models = null;
     }
 
     /**
@@ -101,11 +92,14 @@ export class UIMeshRenderer extends Component {
      * 注意：不要手动调用该函数，除非你理解整个流程。
      */
     public updateAssembler (render: IBatcher) {
-        if (this._models) {
+        if (this._modelComponent) {
+            const models = this._modelComponent._collectModels();
             // @ts-expect-error: UIMeshRenderer do not attachToScene
             this._modelComponent._detachFromScene();
-            for (const m of this._models) {
-                render.commitModel.call(render, this, m, this._modelComponent!.material);
+            for (let i = 0; i < models.length; i++) {
+                if (models[i].enabled) {
+                    render.commitModel(this, models[i], this._modelComponent.material);
+                }
             }
             return true;
         }

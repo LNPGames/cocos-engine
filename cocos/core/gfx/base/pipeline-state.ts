@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 import { PipelineLayout } from './pipeline-layout';
 import { RenderPass } from './render-pass';
@@ -351,7 +348,7 @@ export abstract class PipelineState extends GFXObject {
         super(ObjectType.PIPELINE_STATE);
     }
 
-    public abstract initialize (info: PipelineStateInfo): void;
+    public abstract initialize (info: Readonly<PipelineStateInfo>): void;
 
     public abstract destroy (): void;
 }

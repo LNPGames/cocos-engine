@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 import { GFXObject, ObjectType, SamplerInfo } from '../define';
 
@@ -41,13 +38,13 @@ export class Sampler extends GFXObject {
     protected _info: SamplerInfo = new SamplerInfo();
     protected _hash = 0;
 
-    constructor (info: SamplerInfo, hash: number) {
+    constructor (info: Readonly<SamplerInfo>, hash: number) {
         super(ObjectType.SAMPLER);
         this._info.copy(info);
         this._hash = hash;
     }
 
-    static computeHash (info: SamplerInfo) {
+    static computeHash (info: Readonly<SamplerInfo>) {
         let hash = info.minFilter;
         hash |= (info.magFilter << 2);
         hash |= (info.mipFilter << 4);

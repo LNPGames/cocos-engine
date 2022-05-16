@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 import { Buffer } from './buffer';
 import { murmurhash2_32_gc } from '../../utils/murmurhash2_gc';
@@ -193,6 +190,6 @@ export abstract class InputAssembler extends GFXObject {
         return murmurhash2_32_gc(res, 666);
     }
 
-    public abstract initialize (info: InputAssemblerInfo): void;
+    public abstract initialize (info: Readonly<InputAssemblerInfo>): void;
     public abstract destroy (): void;
 }

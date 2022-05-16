@@ -26,8 +26,7 @@
 
 // Copyright (c) 2017-2020 Xiamen Yaji Software Co., Ltd.
 
-/**
- * @packageDocumentation
+/** @packageDocumentation
  * @module particle
  */
 
@@ -778,16 +777,25 @@ export class ParticleSystem extends RenderableComponent {
         // this._system.add(this);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _onMaterialModified (index: number, material: Material) {
         if (this.processor !== null) {
             this.processor.onMaterialModified(index, material);
         }
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _onRebuildPSO (index: number, material: Material) {
         this.processor.onRebuildPSO(index, material);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _collectModels (): scene.Model[] {
         this._models.length = 0;
         this._models.push((this.processor as any)._model);
@@ -835,7 +843,8 @@ export class ParticleSystem extends RenderableComponent {
     // }
 
     /**
-     * 播放粒子效果。
+     * @en play particle system
+     * @zh 播放粒子效果。
      */
     public play () {
         if (this._isPaused) {
@@ -868,7 +877,8 @@ export class ParticleSystem extends RenderableComponent {
     }
 
     /**
-     * 暂停播放粒子效果。
+     * @en pause particle system
+     * @zh 暂停播放粒子效果。
      */
     public pause () {
         if (this._isStopped) {
@@ -883,7 +893,8 @@ export class ParticleSystem extends RenderableComponent {
     }
 
     /**
-     * 停止播放粒子。
+     * @en stop particle system
+     * @zh 停止播放粒子。
      */
     public stop () {
         if (this._isPlaying || this._isPaused) {
@@ -910,9 +921,9 @@ export class ParticleSystem extends RenderableComponent {
         }
     }
 
-    // remove all particles from current particle system.
     /**
-     * 将所有粒子从粒子系统中清除。
+     * @en remove all particles from current particle system.
+     * @zh 将所有粒子从粒子系统中清除。
      */
     public clear () {
         if (this.enabledInHierarchy) {
@@ -954,7 +965,7 @@ export class ParticleSystem extends RenderableComponent {
 
     protected onEnable () {
         legacyCC.director.on(legacyCC.Director.EVENT_BEFORE_COMMIT, this.beforeRender, this);
-        if (this.playOnAwake) {
+        if (this.playOnAwake && !EDITOR) {
             this.play();
         }
         this.processor.onEnable();
@@ -1128,6 +1139,24 @@ export class ParticleSystem extends RenderableComponent {
         this.processor.beforeRender();
         if (this._trailModule && this._trailModule.enable) {
             this._trailModule.beforeRender();
+        }
+
+        if (this.getParticleCount() <= 0) {
+            this.processor.detachFromScene();
+            if (this._trailModule && this._trailModule.enable) {
+                this._trailModule._detachFromScene();
+            }
+        } else if (this.getParticleCount() > 0) {
+            if (!this._isCulled) {
+                if (!this.processor.getModel()?.scene) {
+                    this.processor.attachToScene();
+                }
+                if (this._trailModule && this._trailModule.enable) {
+                    if (!this._trailModule.getModel()?.scene) {
+                        this._trailModule._attachToScene();
+                    }
+                }
+            }
         }
     }
 
@@ -1356,6 +1385,9 @@ export class ParticleSystem extends RenderableComponent {
         return this._time;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _onBeforeSerialize (props) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this.dataCulling ? props.filter((p) => !PARTICLE_MODULE_PROPERTY.includes(p) || (this[p] && this[p].enable)) : props;

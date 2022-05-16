@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 import { CommandBuffer } from './command-buffer';
 import { GFXObject, ObjectType, QueueType, QueueInfo } from './define';
@@ -50,7 +47,7 @@ export abstract class Queue extends GFXObject {
         super(ObjectType.QUEUE);
     }
 
-    public abstract initialize (info: QueueInfo): void;
+    public abstract initialize (info: Readonly<QueueInfo>): void;
 
     public abstract destroy (): void;
 
@@ -60,5 +57,5 @@ export abstract class Queue extends GFXObject {
      * @param cmdBuffs The command buffers to be submitted.
      * @param fence The syncing fence.
      */
-    public abstract submit (cmdBuffs: CommandBuffer[]): void;
+    public abstract submit (cmdBuffs: Readonly<CommandBuffer[]>): void;
 }

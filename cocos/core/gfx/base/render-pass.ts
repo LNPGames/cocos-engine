@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 import { murmurhash2_32_gc } from '../../utils/murmurhash2_gc';
 import {
@@ -48,9 +45,9 @@ export abstract class RenderPass extends GFXObject {
     protected _subpasses: SubpassInfo[] = [];
     protected _hash = 0;
 
-    get colorAttachments () { return this._colorInfos; }
-    get depthStencilAttachment () { return this._depthStencilInfo; }
-    get subPasses () { return this._subpasses; }
+    get colorAttachments () : Readonly<ColorAttachment[]> { return this._colorInfos; }
+    get depthStencilAttachment () : Readonly<DepthStencilAttachment> | null { return this._depthStencilInfo; }
+    get subPasses () : Readonly<SubpassInfo[]> { return this._subpasses; }
     get hash () { return this._hash; }
 
     constructor () {
@@ -97,7 +94,7 @@ export abstract class RenderPass extends GFXObject {
         return murmurhash2_32_gc(res, 666);
     }
 
-    public abstract initialize (info: RenderPassInfo): void;
+    public abstract initialize (info: Readonly<RenderPassInfo>): void;
 
     public abstract destroy (): void;
 }

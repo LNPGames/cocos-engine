@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 import { GFXObject, ObjectType, SurfaceTransform, SwapchainInfo } from './define';
 import { Texture } from './texture';
@@ -76,7 +73,7 @@ export abstract class Swapchain extends GFXObject {
         super(ObjectType.SWAPCHAIN);
     }
 
-    public abstract initialize (info: SwapchainInfo): void;
+    public abstract initialize (info: Readonly<SwapchainInfo>): void;
     public abstract resize (width: number, height: number, surfaceTransform: SurfaceTransform): void;
     public abstract destroy (): void;
 }

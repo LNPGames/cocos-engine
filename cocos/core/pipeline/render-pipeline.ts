@@ -23,19 +23,17 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module pipeline
- */
+
 
 import { ccclass, displayOrder, serializable, type } from 'cc.decorator';
 import { systemInfo } from 'pal/system-info';
 import { sceneCulling, validPunctualLightsCulling } from './scene-culling';
 import { Asset } from '../assets/asset';
-import { AccessType, Attribute, Buffer, BufferInfo, BufferUsageBit, ClearFlagBit, ClearFlags, ColorAttachment, CommandBuffer,
-    DepthStencilAttachment, DescriptorSet, Device, Feature, Format, Framebuffer, FramebufferInfo, InputAssembler, InputAssemblerInfo,
-    LoadOp, MemoryUsageBit, Rect, RenderPass, RenderPassInfo, Sampler, StoreOp, SurfaceTransform, Swapchain, Texture, TextureInfo,
-    TextureType, TextureUsageBit, Viewport } from '../gfx';
+import { AccessFlagBit, Attribute, Buffer, BufferInfo, BufferUsageBit, ClearFlagBit, ClearFlags, ColorAttachment, CommandBuffer,
+    DepthStencilAttachment, DescriptorSet, Device, Feature, Format, FormatFeatureBit, Framebuffer, FramebufferInfo, InputAssembler,
+    InputAssemblerInfo, LoadOp, MemoryUsageBit, Rect, RenderPass, RenderPassInfo, Sampler, StoreOp, SurfaceTransform, Swapchain,
+    Texture, TextureInfo, TextureType, TextureUsageBit, Viewport, GeneralBarrierInfo,
+} from '../gfx';
 import { legacyCC } from '../global-exports';
 import { MacroRecord } from '../renderer/core/pass-utils';
 import { RenderWindow } from '../renderer/core/render-window';
@@ -43,6 +41,7 @@ import { Camera, SKYBOX_FLAG } from '../renderer/scene/camera';
 import { Model } from '../renderer/scene/model';
 import { Root } from '../root';
 import { GlobalDSManager } from './global-descriptor-set-manager';
+import { GeometryRenderer } from './geometry-renderer';
 import { PipelineSceneData } from './pipeline-scene-data';
 import { PipelineUBO } from './pipeline-ubo';
 import { RenderFlow } from './render-flow';
@@ -224,6 +223,10 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent {
         return this._profiler;
     }
 
+    get geometryRenderer () {
+        return this._geometryRenderer;
+    }
+
     set clusterEnabled (value) {
         this._clusterEnabled = value;
     }
@@ -248,6 +251,7 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent {
     protected _macros: MacroRecord = {};
     protected _constantMacros = '';
     protected _profiler: Model | null = null;
+    protected _geometryRenderer = new GeometryRenderer();
     protected declare _pipelineSceneData: PipelineSceneData;
     protected _pipelineRenderData: PipelineRenderData | null = null;
     protected _renderPasses = new Map<ClearFlags, RenderPass>();
@@ -282,7 +286,10 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent {
                 colorAttachment.loadOp = LoadOp.DISCARD;
             } else {
                 colorAttachment.loadOp = LoadOp.LOAD;
-                colorAttachment.beginAccesses = [AccessType.COLOR_ATTACHMENT_WRITE];
+                colorAttachment.barrier = device.getGeneralBarrier(new GeneralBarrierInfo(
+                    AccessFlagBit.COLOR_ATTACHMENT_WRITE,
+                    AccessFlagBit.COLOR_ATTACHMENT_WRITE,
+                ));
             }
         }
 
@@ -290,7 +297,10 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent {
             if (!(clearFlags & ClearFlagBit.DEPTH)) depthStencilAttachment.depthLoadOp = LoadOp.LOAD;
             if (!(clearFlags & ClearFlagBit.STENCIL)) depthStencilAttachment.stencilLoadOp = LoadOp.LOAD;
         }
-        depthStencilAttachment.beginAccesses = [AccessType.DEPTH_STENCIL_ATTACHMENT_WRITE];
+        depthStencilAttachment.barrier = device.getGeneralBarrier(new GeneralBarrierInfo(
+            AccessFlagBit.DEPTH_STENCIL_ATTACHMENT_WRITE,
+            AccessFlagBit.DEPTH_STENCIL_ATTACHMENT_WRITE,
+        ));
 
         const renderPassInfo = new RenderPassInfo([colorAttachment], depthStencilAttachment);
 
@@ -379,6 +389,7 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent {
         this._macros.CC_USE_HDR = this._pipelineSceneData.isHDR;
         this._generateConstantMacros();
         this._pipelineSceneData.activate(this._device, this);
+        this._geometryRenderer.activate(this._device, this);
 
         for (let i = 0; i < this._flows.length; i++) {
             this._flows[i].activate(this);
@@ -631,13 +642,15 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent {
         this._commandBuffers.length = 0;
         this._pipelineUBO.destroy();
         this._pipelineSceneData?.destroy();
+        this._geometryRenderer.destroy();
 
         return super.destroy();
     }
 
     protected _generateConstantMacros () {
         let str = '';
-        str += `#define CC_DEVICE_SUPPORT_FLOAT_TEXTURE ${this.device.hasFeature(Feature.TEXTURE_FLOAT) ? 1 : 0}\n`;
+        str += `#define CC_DEVICE_SUPPORT_FLOAT_TEXTURE ${this.device.getFormatFeatures(Format.RGBA32F)
+            & (FormatFeatureBit.RENDER_TARGET | FormatFeatureBit.SAMPLED_TEXTURE) ? 1 : 0}\n`;
         str += `#define CC_ENABLE_CLUSTERED_LIGHT_CULLING ${this._clusterEnabled ? 1 : 0}\n`;
         str += `#define CC_DEVICE_MAX_VERTEX_UNIFORM_VECTORS ${this.device.capabilities.maxVertexUniformVectors}\n`;
         str += `#define CC_DEVICE_MAX_FRAGMENT_UNIFORM_VECTORS ${this.device.capabilities.maxFragmentUniformVectors}\n`;
@@ -658,7 +671,10 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent {
         colorAttachment.format = Format.RGBA8;
         colorAttachment.loadOp = LoadOp.CLEAR;
         colorAttachment.storeOp = StoreOp.STORE;
-        colorAttachment.endAccesses = [AccessType.COLOR_ATTACHMENT_WRITE];
+        colorAttachment.barrier = device.getGeneralBarrier(new GeneralBarrierInfo(
+            AccessFlagBit.NONE,
+            AccessFlagBit.COLOR_ATTACHMENT_WRITE,
+        ));
         bloom.renderPass = device.createRenderPass(new RenderPassInfo([colorAttachment]));
 
         let curWidth = this._width;

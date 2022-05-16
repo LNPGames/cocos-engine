@@ -24,10 +24,6 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @hidden
- */
 import './deprecation';
 
 export { Asset } from './asset';
@@ -42,5 +38,6 @@ export { ImageAsset } from './image-asset';
 export { Texture2D } from './texture-2d';
 export { TextureCube } from './texture-cube';
 export { EffectAsset } from './effect-asset';
+export type { IMaterialInfo } from './material';
 export { Material } from './material';
 export { RenderTexture } from './render-texture';

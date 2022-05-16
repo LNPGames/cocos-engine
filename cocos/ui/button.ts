@@ -24,11 +24,6 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module ui
- */
-
 import { ccclass, help, executionOrder, menu, requireComponent, tooltip, displayOrder, type, rangeMin, rangeMax, serializable, executeInEditMode } from 'cc.decorator';
 import { EDITOR } from 'internal:constants';
 import { SpriteFrame } from '../2d/assets';
@@ -235,6 +230,10 @@ export class Button extends Component {
         //         this.normalSprite = this._previousNormalSprite;
         //     }
         // }
+        if (this._interactable === value) {
+            return;
+        }
+
         this._interactable = value;
         this._updateState();
 
@@ -826,7 +825,7 @@ export class Button extends Component {
             return;
         }
 
-        const hit = this.node._uiProps.uiTransformComp!.isHit(touch.getUILocation());
+        const hit = this.node._uiProps.uiTransformComp!.hitTest(touch.getLocation());
 
         if (this._transition === Transition.SCALE && this.target && this._originalScale) {
             if (hit) {

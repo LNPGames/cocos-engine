@@ -25,11 +25,6 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module asset
- */
-
 import { ccclass } from 'cc.decorator';
 import { EDITOR, TEST, BUILD } from 'internal:constants';
 import { Rect, Size, Vec2 } from '../../core/math';
@@ -38,7 +33,7 @@ import { TextureBase } from '../../core/assets/texture-base';
 import { legacyCC } from '../../core/global-exports';
 import { ImageAsset, ImageSource } from '../../core/assets/image-asset';
 import { Texture2D } from '../../core/assets/texture-2d';
-import { errorID } from '../../core/platform/debug';
+import { errorID, warnID } from '../../core/platform/debug';
 import { dynamicAtlasManager } from '../utils/dynamic-atlas/atlas-manager';
 import { js } from '../../core/utils/js';
 
@@ -239,8 +234,8 @@ export class SpriteFrame extends Asset {
     }
 
     /**
-     * @en
-     * @zh
+     * @en uv update event
+     * @zh uv 更新事件
      */
     public static EVENT_UV_UPDATED = 'uv_updated';
 
@@ -404,7 +399,11 @@ export class SpriteFrame extends Asset {
 
     set texture (value) {
         if (!value) {
-            console.warn(`Error Texture in ${this.name}`);
+            warnID(3122, this.name);
+            return;
+        }
+
+        if (value === this._texture) {
             return;
         }
 
@@ -657,7 +656,7 @@ export class SpriteFrame extends Asset {
     }
 
     /**
-     * @en Gets the related GFX [[Texture]] resource
+     * @en Gets the related GFX [[gfx.Texture]] resource
      * @zh 获取渲染贴图的 GFX 资源
      */
     public getGFXTexture () {
@@ -794,7 +793,10 @@ export class SpriteFrame extends Asset {
         return super.destroy();
     }
 
-    // Calculate UV for sliced
+    /**
+     * Calculate UV for sliced
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _calculateSlicedUV () {
         const rect = this._rect;
         // const texture = this._getCalculateTarget()!;
@@ -857,7 +859,10 @@ export class SpriteFrame extends Asset {
         this.emit(SpriteFrame.EVENT_UV_UPDATED, this);
     }
 
-    // Calculate UV
+    /**
+     * Calculate UV
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _calculateUV () {
         const rect = this._rect;
         const uv = this.uv;
@@ -1089,6 +1094,9 @@ export class SpriteFrame extends Asset {
         this._calculateSlicedUV();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _setDynamicAtlasFrame (frame) {
         if (!frame) return;
 
@@ -1104,6 +1112,9 @@ export class SpriteFrame extends Asset {
         this._calculateUV();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _resetDynamicAtlasFrame () {
         if (!this._original) return;
         this._rect.x = this._original._x;
@@ -1113,6 +1124,9 @@ export class SpriteFrame extends Asset {
         this._calculateUV();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _checkPackable () {
         const dynamicAtlas = dynamicAtlasManager;
         if (!dynamicAtlas) return;
@@ -1136,7 +1150,9 @@ export class SpriteFrame extends Asset {
         }
     }
 
-    // SERIALIZATION
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _serialize (ctxForExporting: any): any {
         if (EDITOR || TEST) {
             const rect = { x: this._rect.x, y: this._rect.y, width: this._rect.width, height: this._rect.height };
@@ -1180,6 +1196,9 @@ export class SpriteFrame extends Asset {
         return null;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _deserialize (serializeData: any, handle: any) {
         const data = serializeData as ISpriteFramesSerializeData;
         const rect = data.rect;

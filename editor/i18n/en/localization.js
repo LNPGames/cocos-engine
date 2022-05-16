@@ -6,9 +6,6 @@ const version = pkg.version.replace(/(^\d+\.\d+)\..*$/, (str, a) => {
 const url = 'https://docs.cocos.com/creator';
 
 module.exports = {
-    menu: {
-        custom_script: 'Custom script',
-    },
     help: {
         cc: {
             Node: `${url}/${version}/manual/en/concepts/scene/node-component.html`,
@@ -19,8 +16,8 @@ module.exports = {
             BlockInputEvents: `${url}/${version}/manual/en/ui-system/components/editor/block-input-events.html`,
             Camera: `${url}/${version}/manual/en/editor/components/camera-component.html`,
             Canvas: `${url}/${version}/manual/en/ui-system/components/editor/canvas.html`,
-            SkinnedMeshRenderer: `${url}/${version}/manual/en/engine/animation/skeletal-animation.html`,
-            SkinnedMeshBatchRenderer: `${url}/${version}/manual/en/engine/animation/skeletal-animation.html`,
+            SkinnedMeshRenderer: `${url}/${version}/manual/en/animation/skeletal-animation.html`,
+            SkinnedMeshBatchRenderer: `${url}/${version}/manual/en/animation/skeletal-animation.html`,
             Ambient: `${url}/${version}/manual/zh/concepts/scene/light/lighttype/ambient.html`,
             Skybox: `${url}/${version}/manual/zh/concepts/scene/skybox.html`,
             Fog: `${url}/${version}/manual/zh/concepts/scene/fog.html`,
@@ -29,8 +26,8 @@ module.exports = {
             SphereLight: `${url}/${version}/manual/en/concepts/scene/light/sphere-light.html`,
             SpotLight: `${url}/${version}/manual/en/concepts/scene/light/spot-light.html`,
             UICoordinateTracker: `${url}/${version}/manual/en/ui-system/components/editor/ui-coordinate-tracker.html`,
-            Animation: `${url}/${version}/manual/en/engine/animation/animation-component.html`,
-            SkeletalAnimation: `${url}/${version}/manual/en/engine/animation/skeletal-animation.html`,
+            Animation: `${url}/${version}/manual/en/animation/animation-component.html`,
+            SkeletalAnimation: `${url}/${version}/manual/en/animation/skeletal-animation.html`,
             AudioSource: `${url}/${version}/manual/en/audio-system/overview.html`,
             Billboard: `${url}/${version}/manual/en/particle-system/billboard-component.html`,
             Line: `${url}/${version}/manual/en/particle-system/line-component.html`,
@@ -70,6 +67,9 @@ module.exports = {
             Spine: ``,
             OctreeCulling: `${url}/${version}/manual/en/advanced-topics/native-scene-culling.html`,
         },
+        assets: {
+            javascript: `${url}/${version}/manual/en/concepts/scene/node-component.html`,
+        },
     },
     ambient: {
         skyLightingColor: 'Sky Color (Upper sphere lighting source).',
@@ -97,8 +97,8 @@ module.exports = {
     },
     shadow: {
         enabled: 'Enable or disable real time shadows.',
-        normal: 'The normal of the plane which receives shadow.',
-        distance: 'The distance from coordinate origin to the receiving plane.',
+        planeDirection: 'The normal vector of the plane which receives shadow.',
+        planeHeight: 'The height from the origin of the plane which receives shadow.',
         saturation: 'Shadow saturation. This value should be 1.0, we recommend that you\'d rather increase ambient lighting than modify this value. ',
         pcf: 'Enable soft shadows.',
         bias: 'Bias value (world space unit) that can avoid moire artifacts with shadows. The more the value, the more the light leakage.',
@@ -110,6 +110,7 @@ module.exports = {
         orthoSize: 'Fix area size, the larger value, the lower precision of shadows.',
         invisibleOcclusionRange: 'If some shadow near the camera is missing, increase this value (world space unit) to fix it.',
         shadowDistance: 'Shadows do not appear beyond this distance (world space unit).',
+        maxReceived: 'Number of the effective light sources that produce shadows.',
     },
     animation: {
         default_clip: 'When checking, the default animation clip is automatically played.',
@@ -534,6 +535,7 @@ module.exports = {
     richtext: {
         string: 'Text of the RichText, you could use BBcode in the string',
         horizontal_align: 'Horizontal alignment',
+        vertical_align: 'Vertical alignment',
         font_size: 'Font size, in points',
         font: 'Custom TTF font of RichText',
         font_family:'Custom System font of RichText',
@@ -763,6 +765,10 @@ module.exports = {
                 label: '3D',
                 description: '3D',
             },
+            animation: {
+                label: 'Animation',
+                description: 'Animation System.',
+            },
         },
         core: {
             label: "Core",
@@ -879,6 +885,18 @@ module.exports = {
         dragon_bones: {
             label: "DragonBones",
             description: "DragonBones support.",
+        },
+        animation: {
+            label: "Basic Animation",
+            description: "Basic animation support.",
+        },
+        skeletal_animation: {
+            label: "Skeletal Animation",
+            description: "Skeletal animation support.",
+        },
+        marionette: {
+            label: "Marionette Animation System",
+            description: "Enable the Marionette animation system",
         },
     },
     renderable_2d: {

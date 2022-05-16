@@ -23,15 +23,10 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @hidden
- */
-
 import { Device, Attribute } from '../../core/gfx';
 import { MeshBuffer } from './mesh-buffer';
 import { BufferAccessor } from './buffer-accessor';
-import { assertID, warnID } from '../../core/platform/debug';
+import { assertID, errorID } from '../../core/platform/debug';
 import { assertIsTrue } from '../../core/data/utils/asserts';
 import { Pool } from '../../core/memop/pool';
 import { macro } from '../../core/platform/macro';
@@ -179,7 +174,7 @@ export class StaticVBAccessor extends BufferAccessor {
             this._allocateChunkFromEntry(bid, eid, entry, byteLength);
             return new StaticVBChunk(this, bid, vertexOffset, vb, indexCount);
         } else {
-            warnID(9004, byteLength);
+            errorID(9004, byteLength);
             return null;
         }
     }

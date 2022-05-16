@@ -23,13 +23,10 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module ui
- */
+
 import { EDITOR } from 'internal:constants';
 import { ccclass, executeInEditMode, requireComponent, disallowMultiple, tooltip,
-    type, displayOrder, serializable, override, visible, displayName } from 'cc.decorator';
+    type, displayOrder, serializable, override, visible, displayName, disallowAnimation } from 'cc.decorator';
 import { Color } from '../../core/math';
 import { ccenum } from '../../core/value-types/enum';
 import { builtinResMgr } from '../../core/builtin';
@@ -106,10 +103,10 @@ export enum InstanceMaterialType {
 
 /**
  * @en Base class for 2D components which supports rendering features.
- * This component will setup [[NodeUIProperties.uiComp]] in its owner [[Node]]
+ * This component will setup NodeUIProperties.uiComp in its owner [[Node]]
  *
  * @zh 所有支持渲染的 2D 组件的基类。
- * 这个组件会设置 [[Node]] 上的 [[NodeUIProperties.uiComp]]。
+ * 这个组件会设置 [[Node]] 上的 NodeUIProperties.uiComp。
  */
 @ccclass('cc.Renderable2D')
 @requireComponent(UITransform)
@@ -119,7 +116,7 @@ export class Renderable2D extends RenderableComponent {
     /**
      * @en The blend factor enums
      * @zh 混合模式枚举类型
-     * @see [[BlendFactor]]
+     * @see [[gfx.BlendFactor]]
      */
     public static BlendState = BlendFactor;
     /**
@@ -168,6 +165,7 @@ export class Renderable2D extends RenderableComponent {
     @displayOrder(0)
     @tooltip('i18n:renderable2D.customMaterial')
     @displayName('CustomMaterial')
+    @disallowAnimation
     get customMaterial () {
         return this._customMaterial;
     }
@@ -175,64 +173,6 @@ export class Renderable2D extends RenderableComponent {
     set customMaterial (val) {
         this._customMaterial = val;
         this.updateMaterial();
-    }
-
-    /**
-     * @en Specifies the source blend mode, it will clone a new material object.
-     * @zh 指定源的混合模式，这会克隆一个新的材质对象，注意这带来的性能和内存损耗。
-     * @example
-     * ```ts
-     * sprite.srcBlendFactor = BlendFactor.ONE;
-     * ```
-     * @deprecated
-     */
-    get srcBlendFactor () {
-        if (!EDITOR && this._customMaterial) {
-            warnID(12001);
-        }
-        return this._srcBlendFactor;
-    }
-
-    set srcBlendFactor (value: BlendFactor) {
-        if (this._customMaterial) {
-            warnID(12001);
-            return;
-        }
-        if (this._srcBlendFactor === value) {
-            return;
-        }
-
-        this._srcBlendFactor = value;
-        this._updateBlendFunc();
-    }
-
-    /**
-     * @en Specifies the destination blend mode.
-     * @zh 指定目标的混合模式，这会克隆一个新的材质对象，注意这带来的性能和内存损耗。
-     * @example
-     * ```ts
-     * sprite.dstBlendFactor = BlendFactor.ONE_MINUS_SRC_ALPHA;
-     * ```
-     * @deprecated
-     */
-    get dstBlendFactor () {
-        if (!EDITOR && this._customMaterial) {
-            warnID(12001);
-        }
-        return this._dstBlendFactor;
-    }
-
-    set dstBlendFactor (value: BlendFactor) {
-        if (this._customMaterial) {
-            warnID(12001);
-            return;
-        }
-        if (this._dstBlendFactor === value) {
-            return;
-        }
-
-        this._dstBlendFactor = value;
-        this._updateBlendFunc();
     }
 
     /**
@@ -283,6 +223,7 @@ export class Renderable2D extends RenderableComponent {
     protected _renderData: RenderData | null = null;
     protected _renderDataFlag = true;
     protected _renderFlag = true;
+
     // 特殊渲染节点，给一些不在节点树上的组件做依赖渲染（例如 mask 组件内置两个 graphics 来渲染）
     protected _delegateSrc: Node | null = null;
     protected _instanceMaterialType = -1;
@@ -294,6 +235,15 @@ export class Renderable2D extends RenderableComponent {
      */
     get blendHash () {
         return this._blendHash;
+    }
+
+    /**
+     * @en Marks for calculating opacity per vertex
+     * @zh 标记组件是否逐顶点计算透明度
+     */
+    protected _useVertexOpacity = false;
+    get useVertexOpacity () {
+        return this._useVertexOpacity;
     }
 
     public updateBlendHash () {
@@ -313,8 +263,10 @@ export class Renderable2D extends RenderableComponent {
     public onEnable () {
         this.node.on(NodeEventType.ANCHOR_CHANGED, this._nodeStateChange, this);
         this.node.on(NodeEventType.SIZE_CHANGED, this._nodeStateChange, this);
+        this.node.on(NodeEventType.PARENT_CHANGED, this._colorDirty, this);
         this.updateMaterial();
         this._renderFlag = this._canRender();
+        this._colorDirty();
     }
 
     // For Redo, Undo
@@ -327,6 +279,7 @@ export class Renderable2D extends RenderableComponent {
     public onDisable () {
         this.node.off(NodeEventType.ANCHOR_CHANGED, this._nodeStateChange, this);
         this.node.off(NodeEventType.SIZE_CHANGED, this._nodeStateChange, this);
+        this.node.off(NodeEventType.PARENT_CHANGED, this._colorDirty, this);
         this._renderFlag = false;
     }
 
@@ -463,6 +416,9 @@ export class Renderable2D extends RenderableComponent {
         }
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _updateBlendFunc () {
         // todo: Not only Pass[0].target[0]
         let target = this._blendState.targets[0];
@@ -499,6 +455,10 @@ export class Renderable2D extends RenderableComponent {
                 renderComp.markForUpdateRenderData();
             }
         }
+    }
+
+    protected _colorDirty () {
+        this.node._uiProps.colorDirty = true;
     }
 
     protected _onMaterialModified (idx: number, material: Material | null) {

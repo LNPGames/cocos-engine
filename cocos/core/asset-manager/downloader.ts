@@ -22,10 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
-/**
- * @packageDocumentation
- * @module asset-manager
- */
+
 import { BUILD, EDITOR } from 'internal:constants';
 import { sys } from '../platform/sys';
 import { js, path } from '../utils';
@@ -110,7 +107,7 @@ const downloadCCONB = (url: string, options: IDownloadParseOptions, onComplete: 
             const ccon = decodeCCONBinary(new Uint8Array(arrayBuffer));
             onComplete(null, ccon);
         } catch (err) {
-            onComplete(err);
+            onComplete(err as Error);
         }
     });
 };
@@ -155,7 +152,8 @@ const downloadBundle = (nameOrUrl: string, options: IBundleOptions, onComplete: 
 
 /**
  * @en
- * Control all download process, it is a singleton. All member can be accessed with `cc.assetManager.downloader` , it can download several types of files:
+ * Control all download process, it is a singleton.
+ * All member can be accessed with `assetManager.downloader`, it can download several types of files:
  * 1. Text
  * 2. Image
  * 3. Audio
@@ -163,7 +161,7 @@ const downloadBundle = (nameOrUrl: string, options: IBundleOptions, onComplete: 
  * 5. Scripts
  *
  * @zh
- * 管理所有下载过程，downloader 是个单例，所有成员能通过 `cc.assetManager.downloader` 访问，它能下载以下几种类型的文件：
+ * 管理所有下载过程，downloader 是个单例，所有成员能通过 `assetManager.downloader` 访问，它能下载以下几种类型的文件：
  * 1. 文本
  * 2. 图片
  * 3. 音频
@@ -326,7 +324,8 @@ export class Downloader {
      *
      * @example
      * downloader.register('.tga', (url, options, onComplete) => onComplete(null, null));
-     * downloader.register({'.tga': (url, options, onComplete) => onComplete(null, null), '.ext': (url, options, onComplete) => onComplete(null, null)});
+     * downloader.register({'.tga': (url, options, onComplete) => onComplete(null, null),
+     *                      '.ext': (url, options, onComplete) => onComplete(null, null)});
      *
      */
     public register (type: string, handler: DownloadHandler): void;
@@ -360,8 +359,8 @@ export class Downloader {
      * @param onComplete.content - The downloaded file
      *
      * @example
-     * download('http://example.com/test.tga', '.tga', {onFileProgress: (loaded, total) => console.log(loaded/total)}, onComplete: (err) => console.log(err));
-     *
+     * download('http://example.com/test.tga', '.tga', { onFileProgress: (loaded, total) => console.log(loaded/total) },
+     *      onComplete: (err) => console.log(err));
      */
     public download (id: string, url: string, type: string, options: IDownloadParseOptions, onComplete: CompleteCallback): void {
         // if it is downloaded, don't download again

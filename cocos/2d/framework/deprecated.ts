@@ -24,10 +24,7 @@
  */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-/**
- * @packageDocumentation
- * @module ui
- */
+
 
 import { markAsWarning, removeProperty, replaceProperty } from '../../core/utils';
 import { UIComponent } from './ui-component';
@@ -44,6 +41,15 @@ removeProperty(UIComponent.prototype, 'UIComponent', [
     },
     {
         name: 'setVisibility',
+    },
+]);
+
+removeProperty(Renderable2D.prototype, 'Renderable2D.prototype', [
+    {
+        name: 'srcBlendFactor',
+    },
+    {
+        name: 'dstBlendFactor',
     },
 ]);
 
@@ -111,17 +117,6 @@ replaceProperty(Canvas.prototype, 'Canvas.prototype', [
             // @ts-expect-error deprecation method
             return this._cameraComponent ? this._cameraComponent.visibility : 0;
         },
-    },
-]);
-
-markAsWarning(Renderable2D.prototype, 'Renderable2D.prototype', [
-    {
-        name: 'srcBlendFactor',
-        suggest: 'Please use a custom material to specify blending options instead.',
-    },
-    {
-        name: 'dstBlendFactor',
-        suggest: 'Please use a custom material to specify blending options instead.',
     },
 ]);
 

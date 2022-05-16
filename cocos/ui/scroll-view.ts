@@ -24,11 +24,6 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module ui
- */
-
 import { ccclass, help, executionOrder, menu, requireComponent, tooltip, displayOrder, range, type, serializable } from 'cc.decorator';
 import { EDITOR } from 'internal:constants';
 import { EventHandler as ComponentEventHandler } from '../core/components/component-event-handler';
@@ -1639,7 +1634,7 @@ export class ScrollView extends ViewGroup {
             if (!this._autoScrollCurrentlyOutOfBoundary) {
                 this._autoScrollCurrentlyOutOfBoundary = true;
                 this._autoScrollBraking = true;
-                this._autoScrollBrakingStartPosition = this._getContentPosition();
+                Vec3.copy(this._autoScrollBrakingStartPosition, this._getContentPosition());
                 return true;
             }
         } else {

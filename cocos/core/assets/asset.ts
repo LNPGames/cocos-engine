@@ -24,10 +24,7 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module asset
- */
+
 
 import { ccclass, serializable } from 'cc.decorator';
 import { EDITOR, PREVIEW } from 'internal:constants';
@@ -65,6 +62,7 @@ import { debug, getError, warn } from '../platform/debug';
 export class Asset extends Eventify(GCObject) {
     /**
      * 应 AssetDB 要求提供这个方法。
+     * @internal
      * @method deserialize
      * @param {String} data
      * @return {Asset}
@@ -84,8 +82,14 @@ export class Asset extends Eventify(GCObject) {
      */
     public loaded = true;
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public declare _uuid: string;
 
+    /**
+     * @internal
+     */
     public declare isDefault: boolean;
 
     /**
@@ -94,9 +98,14 @@ export class Asset extends Eventify(GCObject) {
      * @zh
      * 用于本机资产的可序列化URL。供内部使用。
      * @default ""
+     *
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     @serializable
     public _native = '';
+    /**
+     * @internal
+     */
     public _nativeUrl = '';
 
     private _file: any = null;
@@ -138,7 +147,7 @@ export class Asset extends Eventify(GCObject) {
      * 此资源的基础资源（如果有）。 此属性可用于访问与资源相关的其他详细信息或功能。<br>
      * 如果`_native`可用，则此属性将由加载器初始化。
      * @default null
-     * @private
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     @property
     get _nativeAsset () {
@@ -211,7 +220,7 @@ export class Asset extends Eventify(GCObject) {
      *
      * @param filename
      * @param inLibrary
-     * @private
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _setRawAsset (filename: string, inLibrary = true) {
         if (inLibrary !== false) {
@@ -231,6 +240,9 @@ export class Asset extends Eventify(GCObject) {
      */
     public createNode? (callback: CreateNodeCallback): void;
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public get _nativeDep () {
         if (this._native) {
             return { __isNative__: true, uuid: this._uuid, ext: this._native };

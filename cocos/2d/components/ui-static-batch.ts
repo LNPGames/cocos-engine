@@ -23,10 +23,7 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module ui
- */
+
 
 import { ccclass, help, menu, executionOrder, visible, override } from 'cc.decorator';
 import { Renderable2D } from '../framework/renderable-2d';
@@ -140,6 +137,9 @@ export class UIStaticBatch extends Renderable2D {
         // this._clearData();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _requireDrawBatch () {
         const batch = new DrawBatch2D();
         batch.isStatic = true;

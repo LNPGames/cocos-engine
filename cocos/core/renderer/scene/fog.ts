@@ -27,8 +27,8 @@ import { JSB } from 'internal:constants';
 import { Enum } from '../../value-types';
 import { Color, Vec4 } from '../../math';
 import { legacyCC } from '../../global-exports';
-import { FogInfo } from '../../scene-graph/scene-globals';
-import { NativeFog } from './native-scene';
+import type { FogInfo } from '../../scene-graph/scene-globals';
+import { NativeFog } from '../native-scene';
 import { SRGBToLinear } from '../../pipeline/pipeline-funcs';
 
 const _v4 = new Vec4();
@@ -78,6 +78,10 @@ export const FogType = Enum({
 
 const FOG_TYPE_NONE = FogType.LAYERED + 1;
 
+/**
+ * @en The fog representation in the render scene.
+ * @zh 渲染场景中的全局雾效配置
+ */
 export class Fog {
     /**
      * @zh 是否启用全局雾效

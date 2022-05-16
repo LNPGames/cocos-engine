@@ -23,17 +23,13 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module animation
- */
+
 
 import { clamp01 } from '../math/utils';
 import { remove } from '../utils/array';
 import { AnimationState } from './animation-state';
 import { Playable } from './playable';
-import { legacyCC } from '../global-exports';
-import type { AnimationManager } from './animation-manager';
+import { getGlobalAnimationManager } from './global-animation-manager';
 
 interface IManagedState {
     state: AnimationState | null;
@@ -60,7 +56,7 @@ export class CrossFade extends Playable {
 
     constructor (scheduler?: CrossFadeScheduler) {
         super();
-        this._scheduler = scheduler ?? legacyCC.director.getAnimationManager() as AnimationManager;
+        this._scheduler = scheduler ?? getGlobalAnimationManager();
     }
 
     public update (deltaTime: number) {

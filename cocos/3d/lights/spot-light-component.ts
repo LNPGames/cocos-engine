@@ -23,20 +23,16 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module component/light
- */
-
-import {
-    ccclass, help, executeInEditMode, menu, tooltip, type, displayOrder, slide, range, serializable, formerlySerializedAs,
-} from 'cc.decorator';
+import { ccclass, range, slide, type, editable, displayOrder, help, executeInEditMode,
+    menu, tooltip, serializable, formerlySerializedAs, visible } from 'cc.decorator';
 import { toRadian } from '../../core/math';
 import { scene } from '../../core/renderer';
 import { Light, PhotometricTerm } from './light-component';
 import { legacyCC } from '../../core/global-exports';
 import { Root } from '../../core/root';
-import { Camera } from '../../core/renderer/scene';
+import { Camera, PCFType, ShadowType } from '../../core/renderer/scene';
+import { property } from '../../core/data/class-decorator';
+import { CCBoolean, CCFloat } from '../../core/data/utils/attribute';
 
 @ccclass('cc.SpotLight')
 @help('i18n:cc.SpotLight')
@@ -51,7 +47,7 @@ export class SpotLight extends Light {
     protected _luminanceHDR = 1700 / scene.nt2lm(0.15);
 
     @serializable
-    protected _luminanceLDR = 1.0;
+    protected _luminanceLDR = 1700 / scene.nt2lm(0.15) * Camera.standardExposureValue * Camera.standardLightMeterScale;
 
     @serializable
     protected _term = PhotometricTerm.LUMINOUS_FLUX;
@@ -61,6 +57,16 @@ export class SpotLight extends Light {
 
     @serializable
     protected _spotAngle = 60;
+
+    // Shadow map properties
+    @serializable
+    protected _shadowEnabled = false;
+    @serializable
+    protected _shadowPcf = PCFType.HARD;
+    @serializable
+    protected _shadowBias = 0.00001;
+    @serializable
+    protected _shadowNormalBias = 0.0;
 
     protected _type = scene.LightType.SPOT;
 
@@ -185,6 +191,78 @@ export class SpotLight extends Light {
         if (this._light) { this._light.spotAngle = toRadian(val); }
     }
 
+    /**
+     * @en Whether activate shadow
+     * @zh 是否启用阴影？
+     */
+    @visible(() => (legacyCC.director.root as Root).pipeline.pipelineSceneData.shadows.type === ShadowType.ShadowMap)
+    @property({ group: { name: 'DynamicShadowSettings', displayOrder: 1 } })
+    @editable
+    @type(CCBoolean)
+    get shadowEnabled () {
+        return this._shadowEnabled;
+    }
+    set shadowEnabled (val) {
+        this._shadowEnabled = val;
+        if (this._light) {
+            this._light.shadowEnabled = val;
+        }
+    }
+
+    /**
+     * @en The pcf level of the shadow generation.
+     * @zh 获取或者设置阴影 pcf 等级。
+     */
+    @visible(() => (legacyCC.director.root as Root).pipeline.pipelineSceneData.shadows.type === ShadowType.ShadowMap)
+    @property({ group: { name: 'DynamicShadowSettings', displayOrder: 2  } })
+    @editable
+    @type(PCFType)
+    get shadowPcf () {
+        return this._shadowPcf;
+    }
+    set shadowPcf (val) {
+        this._shadowPcf = val;
+        if (this._light) {
+            this._light.shadowPcf = val;
+        }
+    }
+
+    /**
+     * @en The depth offset of shadow to avoid moire pattern artifacts
+     * @zh 阴影的深度偏移, 可以减弱跨像素导致的条纹状失真
+     */
+    @visible(() => (legacyCC.director.root as Root).pipeline.pipelineSceneData.shadows.type === ShadowType.ShadowMap)
+    @property({ group: { name: 'DynamicShadowSettings', displayOrder: 3 } })
+    @editable
+    @type(CCFloat)
+    get shadowBias () {
+        return this._shadowBias;
+    }
+    set shadowBias (val) {
+        this._shadowBias = val;
+        if (this._light) {
+            this._light.shadowBias = val;
+        }
+    }
+
+    /**
+     * @en The normal bias of the shadow map.
+     * @zh 设置或者获取法线偏移。
+     */
+    @visible(() => (legacyCC.director.root as Root).pipeline.pipelineSceneData.shadows.type === ShadowType.ShadowMap)
+    @property({ group: { name: 'DynamicShadowSettings', displayOrder: 4 } })
+    @editable
+    @type(CCFloat)
+    get shadowNormalBias () {
+        return this._shadowNormalBias;
+    }
+    set shadowNormalBias (val) {
+        this._shadowNormalBias = val;
+        if (this._light) {
+            this._light.shadowNormalBias = val;
+        }
+    }
+
     constructor () {
         super();
         this._lightType = scene.SpotLight;
@@ -195,15 +273,15 @@ export class SpotLight extends Light {
         this.size = this._size;
         this.range = this._range;
         this.spotAngle = this._spotAngle;
-        if ((legacyCC.director.root as Root).pipeline.pipelineSceneData.isHDR) {
-            this._luminanceLDR = this._luminanceHDR * Camera.standardExposureValue * Camera.standardLightMeterScale;
-        } else {
-            this._luminanceHDR = this._luminanceLDR / Camera.standardExposureValue / Camera.standardLightMeterScale;
-        }
 
         if (this._light) {
             this._light.luminanceHDR = this._luminanceHDR;
             this._light.luminanceLDR = this._luminanceLDR;
+            // shadow info
+            this._light.shadowEnabled = this._shadowEnabled;
+            this._light.shadowPcf = this._shadowPcf;
+            this._light.shadowBias = this._shadowBias;
+            this._light.shadowNormalBias = this._shadowNormalBias;
         }
     }
 }

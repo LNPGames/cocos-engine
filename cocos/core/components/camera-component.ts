@@ -23,13 +23,8 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module component/camera
- */
-
 import { EDITOR } from 'internal:constants';
-import { ccclass, help, executeInEditMode, menu, tooltip, displayOrder, type, serializable } from 'cc.decorator';
+import { ccclass, help, executeInEditMode, menu, tooltip, displayOrder, type, serializable, visible } from 'cc.decorator';
 import { RenderTexture } from '../assets/render-texture';
 import { UITransform } from '../../2d/framework';
 import { Component } from './component';
@@ -85,12 +80,40 @@ export declare namespace Camera {
 @menu('Rendering/Camera')
 @executeInEditMode
 export class Camera extends Component {
+    /**
+     * @en The projection type enumeration of the camera.
+     * @zh 相机的投影类型枚举。
+     */
     public static ProjectionType = ProjectionType;
+    /**
+     * @en The axis type of the fov
+     * @zh FOV 的轴向枚举
+     */
     public static FOVAxis = FOVAxis;
+    /**
+     * @en The clear flag enumeration of the camera.
+     * @zh 相机的清除标志位枚举。
+     */
     public static ClearFlag = ClearFlag;
+    /**
+     * @en The aperture value's enumeration of the camera.
+     * @zh 相机的光圈值枚举。
+     */
     public static Aperture = Aperture;
+    /**
+     * @en The shutter value's enumeration of the camera.
+     * @zh 相机的快门值枚举。
+     */
     public static Shutter = Shutter;
+    /**
+     * @en The ISO value's enumeration of the camera.
+     * @zh 相机的感光度值枚举。
+     */
     public static ISO = ISO;
+    /**
+     * @en The event for target texture changing.
+     * @zh 目标贴图修改的事件。
+     */
     public static TARGET_TEXTURE_CHANGE = 'tex-change';
 
     @serializable
@@ -134,6 +157,10 @@ export class Camera extends Component {
     protected _inEditorMode = false;
     protected _flows: string[] | undefined = undefined;
 
+    /**
+     * @en The render camera representation.
+     * @zh 渲染场景中的相机对象。
+     */
     get camera () {
         return this._camera!;
     }
@@ -259,6 +286,9 @@ export class Camera extends Component {
      */
     @type(FOVAxis)
     @displayOrder(7)
+    @visible(function (this: Camera) {
+        return this._projection === ProjectionType.PERSPECTIVE;
+    })
     @tooltip('i18n:camera.fov_axis')
     get fovAxis () {
         return this._fovAxis;
@@ -278,6 +308,9 @@ export class Camera extends Component {
      * @zh 相机的视角大小。
      */
     @displayOrder(8)
+    @visible(function (this: Camera) {
+        return this._projection === ProjectionType.PERSPECTIVE;
+    })
     @tooltip('i18n:camera.fov')
     get fov () {
         return this._fov;
@@ -293,6 +326,9 @@ export class Camera extends Component {
      * @zh 正交模式下的相机视角高度。
      */
     @displayOrder(9)
+    @visible(function (this: Camera) {
+        return this._projection === ProjectionType.ORTHO;
+    })
     @tooltip('i18n:camera.ortho_height')
     get orthoHeight () {
         return this._orthoHeight;
@@ -438,6 +474,9 @@ export class Camera extends Component {
         if (this._camera) { this._camera.screenScale = val; }
     }
 
+    /**
+     * @internal
+     */
     get inEditorMode () {
         return this._inEditorMode;
     }
@@ -531,6 +570,9 @@ export class Camera extends Component {
         return out;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _createCamera () {
         if (!this._camera) {
             this._camera = (legacyCC.director.root as Root).createCamera();

@@ -32,16 +32,53 @@ import { UNIFORM_ENVIRONMENT_BINDING, UNIFORM_DIFFUSEMAP_BINDING } from '../../p
 import { MaterialInstance } from '../core/material-instance';
 import { Model } from './model';
 import { legacyCC } from '../../global-exports';
-import { SkyboxInfo } from '../../scene-graph/scene-globals';
+import type { SkyboxInfo } from '../../scene-graph/scene-globals';
 import { Root } from '../../root';
-import { NaitveSkybox } from './native-scene';
+import { NaitveSkybox } from '../native-scene';
 import { GlobalDSManager } from '../../pipeline/global-descriptor-set-manager';
 import { Device } from '../../gfx';
+import { Enum } from '../../value-types';
 
 let skybox_mesh: Mesh | null = null;
 let skybox_material: Material | null = null;
 
+export const EnvironmentLightingType = Enum({
+    /**
+     * @zh
+     * 半球漫反射
+     * @en
+     * hemisphere diffuse
+     * @readonly
+     */
+    HEMISPHERE_DIFFUSE: 0,
+    /**
+     * @zh
+     * 半球漫反射和环境反射
+     * @en
+     * hemisphere diffuse and Environment reflection
+     * @readonly
+     */
+    AUTOGEN_HEMISPHERE_DIFFUSE_WITH_REFLECTION: 1,
+    /**
+     * @zh
+     * 漫反射卷积图和环境反射
+     * @en
+     * diffuse convolution map and environment reflection
+     * @readonly
+     */
+    DIFFUSEMAP_WITH_REFLECTION: 2,
+});
+
+/**
+ * @en The skybox configuration of the render scene,
+ * currently some rendering options like hdr and ibl lighting configuration is also here.
+ * @zh 渲染场景的天空盒配置，目前一些渲染配置，比如 HDR 模式和环境光照配置也在 Skybox 中。
+ */
 export class Skybox {
+    /**
+     * @en The Model object of the skybox
+     * @zh 天空盒的 Model 对象
+     */
     get model (): Model | null {
         return this._model;
     }
@@ -58,8 +95,9 @@ export class Skybox {
         this._setEnabled(val);
         if (val) this.activate(); else this._updatePipeline();
     }
+
     /**
-     * @en HDR
+     * @en Whether HDR mode is enabled
      * @zh 是否启用HDR？
      */
     get useHDR (): boolean {
@@ -72,7 +110,7 @@ export class Skybox {
     }
 
     /**
-     * @en Whether use IBL
+     * @en Whether use image based lighting for PBR materials
      * @zh 是否启用IBL？
      */
     get useIBL (): boolean {
@@ -94,7 +132,7 @@ export class Skybox {
 
     set useDiffuseMap (val: boolean) {
         this._useDiffuseMap = val;
-        this.setDiffuseMaps(null, null);
+        this._updatePipeline();
     }
 
     /**
@@ -165,6 +203,9 @@ export class Skybox {
     protected _useDiffuseMap = false;
     protected declare _nativeObj: NaitveSkybox | null;
 
+    /**
+     * @internal
+     */
     get native (): NaitveSkybox {
         return this._nativeObj!;
     }
@@ -210,24 +251,26 @@ export class Skybox {
         this._setUseHDR(skyboxInfo.useHDR);
     }
 
+    /**
+     * @en Set the environment maps for HDR and LDR mode
+     * @zh 为 HDR 和 LDR 模式设置环境贴图
+     * @param envmapHDR @en Environment map for HDR mode @zh HDR 模式下的环境贴图
+     * @param envmapLDR @en Environment map for LDR mode @zh LDR 模式下的环境贴图
+     */
     public setEnvMaps (envmapHDR: TextureCube | null, envmapLDR: TextureCube | null) {
         this._envmapHDR = envmapHDR;
         this._envmapLDR = envmapLDR;
-
-        const root = legacyCC.director.root as Root;
-        const isHDR = root.pipeline.pipelineSceneData.isHDR;
-        if (isHDR) {
-            if (envmapHDR) {
-                root.pipeline.pipelineSceneData.ambient.mipmapCount = envmapHDR.mipmapLevel;
-            }
-        } else if (envmapLDR) {
-            root.pipeline.pipelineSceneData.ambient.mipmapCount = envmapLDR.mipmapLevel;
-        }
 
         this._updateGlobalBinding();
         this._updatePipeline();
     }
 
+    /**
+     * @en Set the diffuse maps
+     * @zh 设置环境光漫反射贴图
+     * @param diffuseMapHDR @en Diffuse map for HDR mode @zh HDR 模式下的漫反射贴图
+     * @param diffuseMapLDR  @en Diffuse map for LDR mode @zh LDR 模式下的漫反射贴图
+     */
     public setDiffuseMaps (diffuseMapHDR: TextureCube | null, diffuseMapLDR: TextureCube | null) {
         this._diffuseMapHDR = diffuseMapHDR;
         this._diffuseMapLDR = diffuseMapLDR;

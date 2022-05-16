@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module terrain
- */
+
 import { ccclass, serializable } from 'cc.decorator';
 import { Asset, Texture2D } from '../core/assets';
 import { legacyCC } from '../core/global-exports';
@@ -217,7 +214,7 @@ export class TerrainLayerInfo {
  * @en terrain layer binary info
  * @zh 地形纹理二进制信息
  */
- @ccclass('cc.TerrainLayerBinaryInfo')
+@ccclass('cc.TerrainLayerBinaryInfo')
 export class TerrainLayerBinaryInfo {
     public slot = 0;
     public tileSize = 1;
@@ -250,10 +247,12 @@ export class TerrainAsset extends Asset {
         super();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     get _nativeAsset (): ArrayBuffer {
         return this._data!.buffer;
     }
-
     set _nativeAsset (value: ArrayBuffer) {
         if (this._data && this._data.byteLength === value.byteLength) {
             this._data.set(new Uint8Array(value));
@@ -405,10 +404,16 @@ export class TerrainAsset extends Asset {
         return this._blockCount[1] * TERRAIN_BLOCK_TILE_COMPLEXITY + 1;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _setNativeData (_nativeData: Uint8Array) {
         this._data = _nativeData;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _loadNativeData (_nativeData: Uint8Array) {
         if (!_nativeData || _nativeData.length === 0) {
             return false;
@@ -480,6 +485,9 @@ export class TerrainAsset extends Asset {
         return true;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _exportNativeData (): Uint8Array {
         const stream = new TerrainBuffer();
 
@@ -539,6 +547,9 @@ export class TerrainAsset extends Asset {
         return stream.buffer;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _exportDefaultNativeData (): Uint8Array {
         const stream = new TerrainBuffer();
         stream.writeInt32(TERRAIN_DATA_VERSION_DEFAULT);

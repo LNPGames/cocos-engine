@@ -1,7 +1,4 @@
-/**
- * @packageDocumentation
- * @module spine
- */
+
 
 import { TrackEntryListeners } from './track-entry-listeners';
 import spine from './lib/spine-core.js';
@@ -99,6 +96,9 @@ export class AnimationCache {
     public maxVertexCount = 0;
     public maxIndexCount = 0;
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _privateMode = false;
     protected _inited = false;
     protected _invalid = true;
@@ -178,7 +178,7 @@ export class AnimationCache {
         const state = skeletonInfo?.state;
 
         const animation = skeleton?.data.findAnimation(this._animationName!);
-        state?.setAnimationWith(0, animation!, false);
+        state?.setAnimationWith(0, animation!, false, false);
         this.bind(listener!);
 
         // record cur animation cache
@@ -453,6 +453,10 @@ export class AnimationCache {
 
         for (let slotIdx = 0, slotCount = skeleton.drawOrder.length; slotIdx < slotCount; slotIdx++) {
             slot = skeleton.drawOrder[slotIdx];
+
+            if (!slot.bone.active) {
+                continue;
+            }
 
             _vfCount = 0;
             _indexCount = 0;

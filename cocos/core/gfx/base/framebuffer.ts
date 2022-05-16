@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 import { RenderPass } from './render-pass';
 import { Texture } from './texture';
@@ -69,7 +66,7 @@ export abstract class Framebuffer extends GFXObject {
         super(ObjectType.FRAMEBUFFER);
     }
 
-    public abstract initialize (info: FramebufferInfo): void;
+    public abstract initialize (info: Readonly<FramebufferInfo>): void;
 
     public abstract destroy (): void;
 }

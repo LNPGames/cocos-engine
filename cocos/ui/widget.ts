@@ -24,10 +24,7 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module ui
- */
+
 
 import { ccclass, help, executeInEditMode, executionOrder, menu, requireComponent, tooltip, type, editorOnly, editable, serializable, visible } from 'cc.decorator';
 import { EDITOR, DEV } from 'internal:constants';
@@ -726,9 +723,21 @@ export class Widget extends Component {
 
     public static AlignMode = AlignMode;
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _lastPos = new Vec3();
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _lastSize = new Size();
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _dirty = true;
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _hadAlignOnce = false;
 
     @serializable
@@ -792,6 +801,9 @@ export class Widget extends Component {
         legacyCC._widgetManager.updateAlignment(this.node);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _validateTargetInDEV () {
         if (!DEV) {
             return;
@@ -830,13 +842,25 @@ export class Widget extends Component {
         this._removeParentEvent();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _adjustWidgetToAllowMovingInEditor (eventType: TransformBit) {}
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _adjustWidgetToAllowResizingInEditor () {}
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _adjustWidgetToAnchorChanged () {
         this.setDirty();
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _adjustTargetToParentChanged (oldParent: Node) {
         if (oldParent) {
             this._unregisterOldParentEvents(oldParent);

@@ -24,10 +24,7 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module asset
- */
+
 
 // @ts-check
 import { EDITOR, TEST } from 'internal:constants';
@@ -287,7 +284,7 @@ export class TextureBase extends Asset {
     // SERIALIZATION
 
     /**
-     * @return
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _serialize (ctxForExporting: any): any {
         if (EDITOR || TEST) {
@@ -299,8 +296,7 @@ export class TextureBase extends Asset {
     }
 
     /**
-     *
-     * @param data
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _deserialize (serializedData: any, handle: any) {
         const data = serializedData as string;

@@ -1193,6 +1193,18 @@ Loading texture with unsupported type: '%s'. Add '%s' into 'cc.macro.SUPPORT_TEX
 
 Can't find a texture format supported by the current platform! Please add a fallback format in the editor.
 
+### 3122
+
+Error Texture in %s.
+
+### 3123
+
+Set same texture %s.
+
+### 3124
+
+Texture: setMipRange failed because base level is larger than max level
+
 ### 3200
 
 <!-- DEPRECATED -->
@@ -1735,7 +1747,7 @@ Can't find easing type [%s]
 
 ### 3907
 
-animator not added or already removed
+Animation state is not playing or already removed
 
 ### 3908
 
@@ -3167,6 +3179,14 @@ Pass already destroyed.
 
 This is old usage, please swap the parameters.
 
+### 12008
+
+GeometryRenderer: too many lines.
+
+### 12009
+
+GeometryRenderer: too many triangles.
+
 ### 12100
 
 The font size is too big to be fitted into texture atlas. Please switch to other label cache modes or choose a smaller font size.
@@ -3202,3 +3222,21 @@ Graph update has been interrupted since too many transitions(greater than %s) oc
 ### 14100
 
 Pool.destroy no longer take a function as parameter, Please specify destruct function in the construction of Pool instead
+
+### 14200
+
+Can not keep world transform due to the zero scaling of parent node
+
+<!-- Rendering algorithm reserved: 15000 - 16000 -->
+
+### 15000
+
+Can not find corresponding diffuse map for environment lighting, use hemisphere diffuse instead, change environment lighting type to regenerate diffuse map
+
+### 15001
+
+Can not find environment map, disable IBL lighting
+
+### 15002
+
+Diffuse map resource is missing, please change environment lighting type to regenerate resource

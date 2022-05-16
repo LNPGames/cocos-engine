@@ -24,10 +24,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module particle2d
- */
+
 
 import { ccclass, executeInEditMode, serializable, playOnFocus, menu, help, editable, type } from 'cc.decorator';
 import { EDITOR } from 'internal:constants';
@@ -229,6 +226,9 @@ export class MotionStreak extends Renderable2D {
         if (this._assembler) this._assembler.update(this, dt);
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _render (render: IBatcher) {
         render.commitComp(this, this.renderData, this._texture, this._assembler, null);
     }

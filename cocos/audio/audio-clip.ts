@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module component/audio
- */
+
 
 import {
     ccclass, type, serializable, override,
@@ -72,6 +69,9 @@ export class AudioClip extends Asset {
         return destroyResult;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     set _nativeAsset (meta: AudioMeta | null) {
         this._meta = meta;
         if (meta) {
@@ -83,11 +83,13 @@ export class AudioClip extends Asset {
             this._duration = 0;
         }
     }
-
     get _nativeAsset () {
         return this._meta;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     @override
     get _nativeDep () {
         return {

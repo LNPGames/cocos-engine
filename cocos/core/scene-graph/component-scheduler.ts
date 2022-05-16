@@ -23,11 +23,6 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module scene-graph
- */
-
 import { EDITOR, SUPPORT_JIT, DEV, TEST } from 'internal:constants';
 import { CCObject } from '../data/object';
 import { MutableForwardIterator } from '../utils/array';
@@ -368,6 +363,9 @@ export class ComponentScheduler {
         this._updating = false;
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _onEnabled (comp) {
         legacyCC.director.getScheduler().resumeTarget(comp);
         comp._objFlags |= IsOnEnableCalled;
@@ -380,6 +378,9 @@ export class ComponentScheduler {
         }
     }
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _onDisabled (comp) {
         legacyCC.director.getScheduler().pauseTarget(comp);
         comp._objFlags &= ~IsOnEnableCalled;

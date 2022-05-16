@@ -24,10 +24,7 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @hidden
- */
+
 
 import { TEST } from 'internal:constants';
 import { Pool } from '../memop';
@@ -185,6 +182,9 @@ type EventType = string | number;
  * each key is mapped to a CallbackList.
  */
 export class CallbacksInvoker<EventTypeClass extends EventType = EventType> {
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     public _callbackTable: ICallbackTable = createMap(true);
     private _offCallback?: () => void;
 

@@ -24,10 +24,7 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module event
- */
+
 
 import { ccclass, type, serializable, editable, tooltip } from 'cc.decorator';
 import { Node } from '../scene-graph';
@@ -63,6 +60,9 @@ import { legacyCC } from '../global-exports';
  */
 @ccclass('cc.ClickEvent')
 export class EventHandler {
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     get _componentName () {
         this._genCompIdIfNeeded();
 
@@ -114,6 +114,9 @@ export class EventHandler {
     @tooltip('i18n:button.click_event.component')
     public component = '';
 
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
     @serializable
     public _componentId = '';
 

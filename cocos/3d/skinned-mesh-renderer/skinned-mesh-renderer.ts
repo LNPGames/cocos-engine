@@ -23,15 +23,10 @@
  THE SOFTWARE.
 */
 
-/**
- * @packageDocumentation
- * @module model
- */
-
 import {
     ccclass, executeInEditMode, executionOrder, help, menu, tooltip, type,
 } from 'cc.decorator';
-import { AnimationClip } from '../../core/animation/animation-clip';
+import type { AnimationClip } from '../../core/animation/animation-clip';
 import { Material } from '../../core/assets';
 import { Skeleton } from '../assets/skeleton';
 import { Node } from '../../core/scene-graph/node';
@@ -77,7 +72,7 @@ export class SkinnedMeshRenderer extends MeshRenderer {
 
     /**
      * @en The skinning root. (The node where the controlling Animation is located)
-     * 骨骼根节点的引用，对应控制此模型的动画组件所在节点。
+     * @zh 骨骼根节点的引用，对应控制此模型的动画组件所在节点。
      */
     @type(Node)
     @tooltip('i18n:model.skinning_root')
@@ -108,6 +103,7 @@ export class SkinnedMeshRenderer extends MeshRenderer {
     }
 
     public onLoad () {
+        super.onLoad();
         this._tryBindAnimation();
     }
 

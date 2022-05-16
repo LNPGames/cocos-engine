@@ -23,10 +23,7 @@
  THE SOFTWARE.
  */
 
-/**
- * @packageDocumentation
- * @module gfx
- */
+
 
 declare const gfx: any;
 
@@ -49,7 +46,7 @@ export * from './base/render-pass';
 export * from './base/shader';
 export * from './base/texture';
 export * from './base/states/sampler';
-export * from './base/states/global-barrier';
+export * from './base/states/general-barrier';
 export * from './base/states/texture-barrier';
 
 const polyfillCC: Record<string, unknown> = Object.assign({}, defines);
