@@ -445,7 +445,7 @@ export class UITransform extends Component {
         return false;
     }
 
-    
+
     /**
      * @zh 屏幕空间中的点击测试。
      * @en Hit test with point in Screen Space.
@@ -473,7 +473,7 @@ export class UITransform extends Component {
             this.node.getWorldMatrix(_worldMatrix);
             Mat4.invert(_mat4_temp, _worldMatrix);
             if (Mat4.strictEquals(_mat4_temp, _zeroMatrix)) {
-                if(this.node.name != "Panel_BuyFeature") continue;
+                continue;
             }
             Vec2.transformMat4(testPt, v2WorldPt, _mat4_temp);
             testPt.x += this._anchorPoint.x * w;
