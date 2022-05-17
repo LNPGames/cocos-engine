@@ -685,7 +685,7 @@ export class Button extends Component {
         this._transitionFinished = true;
     }
 
-    protected _registerNodeEvent () {
+    public _registerNodeEvent () {
         this.node.on(NodeEventType.TOUCH_START, this._onTouchBegan, this);
         this.node.on(NodeEventType.TOUCH_MOVE, this._onTouchMove, this);
         this.node.on(NodeEventType.TOUCH_END, this._onTouchEnded, this);
@@ -899,7 +899,7 @@ export class Button extends Component {
         this._applyTransition(state);
     }
 
-    protected _getButtonState () {
+    public _getButtonState () {
         let state = State.NORMAL;
         if (!this._interactable) {
             state = State.DISABLED;
