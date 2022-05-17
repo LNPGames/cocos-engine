@@ -23,7 +23,7 @@
  THE SOFTWARE.
  */
 
-import { Mat4, Node } from '../core';
+import { Mat4, Node, Vec3 } from '../core';
 import { Skeleton } from './skeleton';
 import spine from './lib/spine-core.js';
 import { FrameBoneInfo } from './skeleton-cache';
