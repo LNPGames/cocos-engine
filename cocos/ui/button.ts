@@ -941,7 +941,7 @@ export class Button extends Component {
             return;
         }
 
-        if (state === State.PRESSED) {
+        if (state === State.PRESSED || state === State.HOVER) {
             this._zoomUp();
         } else {
             this._zoomBack();
