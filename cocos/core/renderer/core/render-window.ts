@@ -55,8 +55,8 @@ const orientationMap: Record<Orientation, SurfaceTransform> = {
 export class RenderWindow {
     /**
      * @en Get window width. Pre-rotated (i.e. rotationally invariant, always in identity/portrait mode) if possible.
-     * If you want to get oriented size instead, you should use [[Camera.width]] which corresponds to the current screen rotation.
-     * @zh 获取窗口宽度。如果支持交换链预变换，返回值将始终处于单位旋转（竖屏）坐标系下。如果需要获取旋转后的尺寸，请使用 [[Camera.width]]。
+     * If you want to get oriented size instead, you should use [[renderer.scene.Camera.width]] which corresponds to the current screen rotation.
+     * @zh 获取窗口宽度。如果支持交换链预变换，返回值将始终处于单位旋转（竖屏）坐标系下。如果需要获取旋转后的尺寸，请使用 [[renderer.scene.Camera.width]]。
      */
     get width (): number {
         return this._width;
@@ -64,8 +64,8 @@ export class RenderWindow {
 
     /**
      * @en Get window height. Pre-rotated (i.e. rotationally invariant, always in identity/portrait mode) if possible.
-     * If you want to get oriented size instead, you should use [[Camera.width]] which corresponds to the current screen rotation.
-     * @zh 获取窗口高度。如果支持交换链预变换，返回值将始终处于单位旋转（竖屏）坐标系下。如果需要获取旋转后的尺寸，请使用 [[Camera.height]]。
+     * If you want to get oriented size instead, you should use [[renderer.scene.Camera.width]] which corresponds to the current screen rotation.
+     * @zh 获取窗口高度。如果支持交换链预变换，返回值将始终处于单位旋转（竖屏）坐标系下。如果需要获取旋转后的尺寸，请使用 [[renderer.scene.Camera.height]]。
      */
     get height (): number {
         return this._height;
@@ -111,6 +111,9 @@ export class RenderWindow {
     protected _framebuffer: Framebuffer | null = null;
     private declare _nativeObj: NativeRenderWindow | null;
 
+    /**
+     * @internal
+     */
     get native () {
         return this._nativeObj;
     }
@@ -226,6 +229,12 @@ export class RenderWindow {
         }
     }
 
+    /**
+     * @en Extract all render cameras attached to the render window to the output cameras list
+     * @zh 将所有挂载到当前渲染窗口的摄像机存储到输出列表参数中
+     * @param cameras @en The output cameras list, should be empty before invoke this function
+     *                @zh 输出相机列表参数，传入时应该为空
+     */
     public extractRenderCameras (cameras: Camera[]) {
         for (let j = 0; j < this._cameras.length; j++) {
             const camera = this._cameras[j];
@@ -237,9 +246,9 @@ export class RenderWindow {
     }
 
     /**
-     * @zh
-     * 添加渲染相机
-     * @param camera 渲染相机
+     * @en Attach a new camera to the render window
+     * @zh 添加渲染相机
+     * @param camera @en The camera to attach @zh 要挂载的相机
      */
     public attachCamera (camera: Camera) {
         for (let i = 0; i < this._cameras.length; i++) {
@@ -252,9 +261,9 @@ export class RenderWindow {
     }
 
     /**
-     * @zh
-     * 移除渲染相机
-     * @param camera 相机
+     * @en Detach a camera from the render window
+     * @zh 移除场景中的渲染相机
+     * @param camera @en The camera to detach @zh 要移除的相机
      */
     public detachCamera (camera: Camera) {
         for (let i = 0; i < this._cameras.length; ++i) {
@@ -266,13 +275,17 @@ export class RenderWindow {
     }
 
     /**
-     * @zh
-     * 销毁全部渲染相机
+     * @en Clear all attached cameras
+     * @zh 清空全部渲染相机
      */
     public clearCameras () {
         this._cameras.length = 0;
     }
 
+    /**
+     * @en Sort all attached cameras with priority
+     * @zh 按照优先级对所有挂载的相机排序
+     */
     public sortCameras () {
         this._cameras.sort((a: Camera, b: Camera) => a.priority - b.priority);
     }
