@@ -2,6 +2,7 @@
 precision highp float;
 #include <input-standard>
 #include <cc-global>
+#include <decode-base>
 #include <cc-local-batch>
 
 out vec2 v_uv;
