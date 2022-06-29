@@ -415,6 +415,12 @@ export class View extends EventTarget {
         view.setDesignResolutionSize(designedResolution.width, designedResolution.height, resolutionPolicy);
     }
 
+    public rotateDesignResolutionSize(){
+        const windowSize = screen.windowSize;
+        if(windowSize.width > windowSize.height) this.setDesignResolutionSize(1920, 1080, this._resolutionPolicy);
+        else this.setDesignResolutionSize(1080, 1920, this._resolutionPolicy);
+    }
+
     /**
      * @en Sets the resolution policy with designed view size in points.<br/>
      * The resolution policy include: <br/>
@@ -581,6 +587,9 @@ export class View extends EventTarget {
 
     private _updateAdaptResult () {
         legacyCC.director.root.resize(screen.windowSize.width, screen.windowSize.height);
+
+        this.rotateDesignResolutionSize();
+
         // Frame size changed, do resize works
         const width = this._designResolutionSize.width;
         const height = this._designResolutionSize.height;
