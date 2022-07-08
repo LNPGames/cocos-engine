@@ -560,6 +560,7 @@ export class Button extends Component {
     private _fromColor: Color = new Color();
     private _toColor: Color = new Color();
     private _time = 0;
+    private _touchTime = 0;
     private _transitionFinished = true;
     private _fromScale: Vec3 = new Vec3();
     private _toScale: Vec3 = new Vec3();
@@ -618,6 +619,13 @@ export class Button extends Component {
     }
 
     public update (dt: number) {
+        this._touchTime += dt;
+        if(!this._pressed) this._touchTime = 0;
+
+        if(this._pressed && this._touchTime > 1.5){
+            this._onTouchEnded();
+        }
+
         const target = this.target;
         if (this._transitionFinished || !target) {
             return;
