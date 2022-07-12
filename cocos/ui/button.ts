@@ -235,6 +235,8 @@ export class Button extends Component {
         }
 
         this._interactable = value;
+
+        this._applyTarget();
         this._updateState();
 
         if (!this._interactable) {
