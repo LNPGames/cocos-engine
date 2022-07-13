@@ -24,7 +24,7 @@
  THE SOFTWARE.
 */
 
-import { ccclass, help, executionOrder, menu, requireComponent, tooltip, displayOrder, type, rangeMin, rangeMax, serializable, executeInEditMode } from 'cc.decorator';
+import { ccclass, help, executionOrder, menu, requireComponent, tooltip, displayOrder, type, rangeMin, rangeMax, serializable, executeInEditMode, boolean } from 'cc.decorator';
 import { EDITOR } from 'internal:constants';
 import { SpriteFrame } from '../2d/assets';
 import { Component, EventHandler as ComponentEventHandler } from '../core/components';
@@ -234,9 +234,10 @@ export class Button extends Component {
             return;
         }
 
+        this.__preload();
+
         this._interactable = value;
 
-        this._applyTarget();
         this._updateState();
 
         if (!this._interactable) {
@@ -569,8 +570,12 @@ export class Button extends Component {
     private _originalScale: Vec3 | null = null;
     private _sprite: Sprite | null = null;
     private _targetScale: Vec3 = new Vec3();
-
+    private init: boolean = false;
     public __preload () {
+        if(this.init) return;
+
+        this.init = true;
+
         if (!this.target) {
             this.target = this.node;
         }
