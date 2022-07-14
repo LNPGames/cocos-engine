@@ -559,6 +559,8 @@ export class Button extends Component {
     @serializable
     protected _target: Node | null = null;
     private _pressed = false;
+    private _touchMove = false;
+    private _touchMoveTime = 0;
     private _hovered = false;
     private _fromColor: Color = new Color();
     private _toColor: Color = new Color();
@@ -571,6 +573,7 @@ export class Button extends Component {
     private _sprite: Sprite | null = null;
     private _targetScale: Vec3 = new Vec3();
     private init: boolean = false;
+    private position: Vec3 = Vec3.ONE;
     public __preload () {
         if(this.init) return;
 
@@ -607,6 +610,7 @@ export class Button extends Component {
                 }
             }, this);
         }
+        this.position = this.node.getPosition();
     }
 
     public onDisable () {
@@ -624,13 +628,23 @@ export class Button extends Component {
             this._unregisterTargetEvent(this.target);
         }
     }
-
     public update (dt: number) {
         this._touchTime += dt;
-        if(!this._pressed) this._touchTime = 0;
+        this._touchMoveTime += dt;
 
-        if(this._pressed && this._touchTime > 1.5){
-            this._onTouchEnded();
+        //터치 타임이 0으로 갱신이 안되었다는건, touchMove 중이지 않다는 것을 의미합니다.
+        if(this._touchMoveTime > 0.2){
+          this._touchMove = false;
+        }
+
+        if(!this._pressed || this._touchMove) {
+            this._touchTime = 0;
+        }
+
+        if(this._pressed){
+            if(!Vec3.equals(this.position, this.node.getPosition())) this._pressed = false;
+            this.position = this.node.getPosition();
+            if(this._touchTime > 1) this._onTouchEnded();
         }
 
         const target = this.target;
@@ -862,6 +876,8 @@ export class Button extends Component {
             this._applyTransition(state);
         }
 
+        this._touchMove = true;
+        this._touchMoveTime = 0;
         if (event) {
             event.propagationStopped = true;
         }
