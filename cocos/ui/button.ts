@@ -28,7 +28,7 @@ import { ccclass, help, executionOrder, menu, requireComponent, tooltip, display
 import { EDITOR } from 'internal:constants';
 import { SpriteFrame } from '../2d/assets';
 import { Component, EventHandler as ComponentEventHandler } from '../core/components';
-import { UITransform, Renderable2D } from '../2d/framework';
+import { UITransform, Renderable2D, RenderComponent } from '../2d/framework';
 import { EventMouse, EventTouch } from '../input/types';
 import { Color, Vec3 } from '../core/math';
 import { ccenum } from '../core/value-types/enum';
@@ -38,6 +38,7 @@ import { Sprite } from '../2d/components/sprite';
 import { legacyCC } from '../core/global-exports';
 import { TransformBit } from '../core/scene-graph/node-enum';
 import { NodeEventType } from '../core/scene-graph/node-event';
+import {property} from '../core/data/class-decorator';
 
 const _tempColor = new Color();
 
@@ -244,6 +245,33 @@ export class Button extends Component {
             this._resetState();
         }
     }
+
+    @displayOrder(1)
+    get childColorChange () {
+        return this._childColorChange;
+    }
+
+    set childColorChange (value: boolean) {
+        if (this._childColorChange === value) {
+            return;
+        }
+
+        this._childColorChange = value;
+        this._updateState();
+    }
+
+    @displayOrder(1)
+    get childLoop () {
+        return this._childLoop;
+    }
+
+    set childLoop (value: boolean) {
+        if (this._childLoop === value)
+            return;
+
+        this._childLoop = value;
+    }
+
 
     set _resizeToTarget (value: boolean) {
         if (value) {
@@ -558,6 +586,10 @@ export class Button extends Component {
     protected _zoomScale = 1.2;
     @serializable
     protected _target: Node | null = null;
+    @serializable
+    protected _childColorChange: boolean = false;
+    @serializable
+    protected _childLoop: boolean = false;
     private _pressed = false;
     private _touchMove = false;
     private _touchMoveTime = 0;
@@ -1010,6 +1042,25 @@ export class Button extends Component {
         } else if (transition === Transition.SCALE) {
             this._updateScaleTransition(state);
         }
+
+        if(!this._childColorChange) return;
+
+        this.updateChildColor(state, this.node);
+    }
+
+    private updateChildColor(state: string, node: Node){
+        for(let i = 0 ; i < node.children.length; i++) {
+            const render =  node.children[i].getComponent(Renderable2D);
+            if(render == null) continue;
+            if(state == State.NORMAL || state == State.HOVER) {render.color = Color.WHITE;}
+            else if(state == State.PRESSED || state == State.DISABLED) { render.color = Color.GRAY;}
+        }
+
+		if (node.children.length == 0) return;
+
+		for (var i = 0; i < node.children.length; i++) {
+			this.updateChildColor(state, node.children[i]);
+		}
     }
 }
 
