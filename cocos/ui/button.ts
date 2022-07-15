@@ -643,9 +643,10 @@ export class Button extends Component {
 
         if(this._pressed){
             if(!Vec3.equals(this.position, this.node.getPosition())) this._pressed = false;
-            this.position = this.node.getPosition();
             if(this._touchTime > 1) this._onTouchEnded();
         }
+
+        this.position = this.node.getPosition();
 
         const target = this.target;
         if (this._transitionFinished || !target) {
