@@ -39,6 +39,7 @@ import { legacyCC } from '../core/global-exports';
 import { TransformBit } from '../core/scene-graph/node-enum';
 import { NodeEventType } from '../core/scene-graph/node-event';
 import {property} from '../core/data/class-decorator';
+import {Vec2} from '@cocos/box2d';
 
 const _tempColor = new Color();
 
@@ -592,7 +593,9 @@ export class Button extends Component {
     protected _childLoop: boolean = false;
     private _pressed = false;
     private _touchMove = false;
-    private _touchMoveTime = 0;
+    get TouchMove () {
+        return this._touchMove;
+    }
     private _hovered = false;
     private _fromColor: Color = new Color();
     private _toColor: Color = new Color();
@@ -662,12 +665,6 @@ export class Button extends Component {
     }
     public update (dt: number) {
         this._touchTime += dt;
-        this._touchMoveTime += dt;
-
-        //터치 타임이 0으로 갱신이 안되었다는건, touchMove 중이지 않다는 것을 의미합니다.
-        if(this._touchMoveTime > 0.2){
-          this._touchMove = false;
-        }
 
         if(!this._pressed || this._touchMove) {
             this._touchTime = 0;
@@ -909,14 +906,20 @@ export class Button extends Component {
             this._applyTransition(state);
         }
 
-        this._touchMove = true;
-        this._touchMoveTime = 0;
+        const distance = Vec3.distance(new Vec3(event.getUIStartLocation().x , event.getUIStartLocation().y), new Vec3(event.getUILocation().x , event.getUILocation().y));
+
+        if (distance > 2) {
+            this._touchMove = true;
+        }
+
         if (event) {
             event.propagationStopped = true;
         }
     }
 
     protected _onTouchEnded (event?: EventTouch) {
+        this._touchMove = false;
+
         if (!this._interactable || !this.enabledInHierarchy) {
             return;
         }
@@ -934,6 +937,8 @@ export class Button extends Component {
     }
 
     protected _onTouchCancel (event?: EventTouch) {
+        this._touchMove = false;
+
         if (!this._interactable || !this.enabledInHierarchy) { return; }
 
         this._pressed = false;
