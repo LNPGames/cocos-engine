@@ -1061,7 +1061,7 @@ export class Button extends Component {
             else if(state == State.PRESSED || state == State.DISABLED) { render.color = Color.GRAY;}
         }
 
-		if (node.children.length == 0) return;
+		if (node.children.length == 0 || !this._childLoop) return;
 
 		for (var i = 0; i < node.children.length; i++) {
 			this.updateChildColor(state, node.children[i]);
