@@ -598,6 +598,9 @@ class LayerEval {
                 if (this._currentNode.kind === NodeKind.exit) {
                     break;
                 }
+                if(this.isFinish){
+                    break;
+                }
                 if (this._currentTransitionPath.length === 0) {
                     // If the update invocation finished the transition,
                     // We force restart the iteration
