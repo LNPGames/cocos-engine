@@ -23,7 +23,7 @@
  THE SOFTWARE.
  */
 
-import {
+ import {
     ALIPAY,
     BAIDU,
     BUILD,
@@ -168,7 +168,7 @@ if (DEV) {
     legacyCC._Test = {};
 }
 
-const engineVersion = '3.5.3.5';
+const engineVersion = '3.5.3.6';
 
 /**
  * The current version of Cocos2d being used.<br/>

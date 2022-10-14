@@ -592,6 +592,9 @@ export class Button extends Component {
     @serializable
     protected _childLoop: boolean = false;
     private _pressed = false;
+    set Pressed(b : boolean){
+        this._pressed = b;
+    }
     private _touchMove = false;
     get TouchMove () {
         return this._touchMove;
