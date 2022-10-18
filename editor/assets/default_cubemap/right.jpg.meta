@@ -1,5 +1,5 @@
 {
-  "ver": "1.0.24",
+  "ver": "1.0.25",
   "importer": "image",
   "imported": true,
   "uuid": "80aabd92-9942-4765-b685-8577a1c88b4e",
@@ -26,7 +26,6 @@
         "imageUuidOrDatabaseUri": "80aabd92-9942-4765-b685-8577a1c88b4e",
         "visible": true
       },
-      "ver": "1.0.21",
       "imported": true,
       "files": [
         ".json"
