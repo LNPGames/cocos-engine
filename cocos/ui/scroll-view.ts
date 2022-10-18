@@ -1281,7 +1281,7 @@ export class ScrollView extends ViewGroup {
         result.y = this.vertical ? result.y : 0;
         return result;
     }
-
+    public anchor = new Vec2();
     protected _moveContent (deltaMove: Vec3, canStartBounceBack?: boolean) {
         const adjustedMove = this._flattenVectorByDirection(deltaMove);
         _tempVec3.set(this._getContentPosition());
@@ -1294,6 +1294,25 @@ export class ScrollView extends ViewGroup {
 
         if (this.elastic && canStartBounceBack) {
             this._startBounceBackIfNeeded();
+        }
+
+        let bottomDelta = this._getContentBottomBoundary() - this._bottomBoundary;
+        bottomDelta = -bottomDelta;
+
+        let leftDelta = this._getContentLeftBoundary() - this._leftBoundary;
+        leftDelta = -leftDelta;
+
+        if (this._content && this.view) {
+            let totalScrollDelta = 0;
+            const uiTrans = this._content._uiProps.uiTransformComp!;
+            const contentSize = uiTrans.contentSize;
+            const scrollSize = this.view.contentSize;
+
+            totalScrollDelta = contentSize.width - scrollSize.width;
+            this.anchor.x = 0;
+
+            totalScrollDelta = contentSize.height - scrollSize.height;
+            this.anchor.y = (bottomDelta - deltaMove.y) / totalScrollDelta;
         }
     }
 

@@ -796,6 +796,7 @@ export class Widget extends Component {
      * ```
      */
     public updateAlignment () {
+        legacyCC._widgetManager.updateOffsetsToStayPut(this, this._alignFlags);
         legacyCC._widgetManager.updateAlignment(this.node);
     }
 

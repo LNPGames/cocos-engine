@@ -201,7 +201,7 @@ export class AnimationCache {
         const state = skeletonInfo?.state;
 
         const animation = skeleton?.data.findAnimation(this._animationName!);
-        state?.setAnimationWith(0, animation!, false);
+        state?.setAnimationWith(0, animation!, false, false);
         this.bind(listener!);
 
         // record cur animation cache

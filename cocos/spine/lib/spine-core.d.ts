@@ -277,7 +277,7 @@ declare namespace spine {
         clearTrack(trackIndex: number): void;
         setCurrent(index: number, current: TrackEntry, interrupt: boolean): void;
         setAnimation(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
-        setAnimationWith(trackIndex: number, animation: Animation, loop: boolean): TrackEntry;
+        setAnimationWith(trackIndex: number, animation: Animation, loop: boolean, reverse:boolean): TrackEntry;
         addAnimation(trackIndex: number, animationName: string, loop: boolean, delay: number): TrackEntry;
         addAnimationWith(trackIndex: number, animation: Animation, loop: boolean, delay: number): TrackEntry;
         setEmptyAnimation(trackIndex: number, mixDuration: number): TrackEntry;

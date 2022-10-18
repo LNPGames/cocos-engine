@@ -23,7 +23,7 @@
  THE SOFTWARE.
  */
 
-import { Mat4, Node } from '../core';
+import { Mat4, Node, Vec3 } from '../core';
 import { Skeleton } from './skeleton';
 import spine from './lib/spine-core.js';
 import { FrameBoneInfo } from './skeleton-cache';
@@ -62,6 +62,8 @@ export class AttachUtil {
         this._skeletonComp = null;
     }
 
+    _cachedScaleX : number = 0;
+    _cachedScaleY : number = 0;
     _syncAttachedNode () {
         if (!this._inited) return;
 
@@ -87,6 +89,11 @@ export class AttachUtil {
             tm.m12 = bone.worldX;
             tm.m13 = bone.worldY;
             node.matrix = tempMat4;
+            if(this._cachedScaleX == bone.scaleX && this._cachedScaleY == bone.scaleY) return;
+            this._cachedScaleX = bone.scaleX;
+            this._cachedScaleY = bone.scaleY;
+
+            node.scale = new Vec3(bone.scaleX, bone.scaleY);
         };
 
         for (const boneIdx of socketNodes.keys()) {

@@ -24,11 +24,11 @@
  THE SOFTWARE.
 */
 
-import { ccclass, help, executionOrder, menu, requireComponent, tooltip, displayOrder, type, rangeMin, rangeMax, serializable, executeInEditMode } from 'cc.decorator';
+import { ccclass, help, executionOrder, menu, requireComponent, tooltip, displayOrder, type, rangeMin, rangeMax, serializable, executeInEditMode, boolean } from 'cc.decorator';
 import { EDITOR } from 'internal:constants';
 import { SpriteFrame } from '../2d/assets';
 import { Component, EventHandler as ComponentEventHandler } from '../core/components';
-import { UITransform, UIRenderer } from '../2d/framework';
+import { UITransform, UIRenderer, Renderable2D, RenderComponent } from '../2d/framework';
 import { EventMouse, EventTouch } from '../input/types';
 import { Color, Vec3 } from '../core/math';
 import { ccenum } from '../core/value-types/enum';
@@ -235,13 +235,43 @@ export class Button extends Component {
             return;
         }
 
+        this.__preload();
+
         this._interactable = value;
+
         this._updateState();
 
         if (!this._interactable) {
             this._resetState();
         }
     }
+
+    @displayOrder(1)
+    get childColorChange () {
+        return this._childColorChange;
+    }
+
+    set childColorChange (value: boolean) {
+        if (this._childColorChange === value) {
+            return;
+        }
+
+        this._childColorChange = value;
+        this._updateState();
+    }
+
+    @displayOrder(1)
+    get childLoop () {
+        return this._childLoop;
+    }
+
+    set childLoop (value: boolean) {
+        if (this._childLoop === value)
+            return;
+
+        this._childLoop = value;
+    }
+
 
     set _resizeToTarget (value: boolean) {
         if (value) {
@@ -556,19 +586,36 @@ export class Button extends Component {
     protected _zoomScale = 1.2;
     @serializable
     protected _target: Node | null = null;
+    @serializable
+    protected _childColorChange: boolean = false;
+    @serializable
+    protected _childLoop: boolean = false;
     private _pressed = false;
+    set Pressed(b : boolean){
+        this._pressed = b;
+    }
+    private _touchMove = false;
+    get TouchMove () {
+        return this._touchMove;
+    }
     private _hovered = false;
     private _fromColor: Color = new Color();
     private _toColor: Color = new Color();
     private _time = 0;
+    private _touchTime = 0;
     private _transitionFinished = true;
     private _fromScale: Vec3 = new Vec3();
     private _toScale: Vec3 = new Vec3();
     private _originalScale: Vec3 | null = null;
     private _sprite: Sprite | null = null;
     private _targetScale: Vec3 = new Vec3();
-
+    private init: boolean = false;
+    private position: Vec3 = Vec3.ONE;
     public __preload () {
+        if(this.init) return;
+
+        this.init = true;
+
         if (!this.target) {
             this.target = this.node;
         }
@@ -600,6 +647,7 @@ export class Button extends Component {
                 }
             }, this);
         }
+        this.position = this.node.getPosition();
     }
 
     public onDisable () {
@@ -617,8 +665,20 @@ export class Button extends Component {
             this._unregisterTargetEvent(this.target);
         }
     }
-
     public update (dt: number) {
+        this._touchTime += dt;
+
+        if(!this._pressed || this._touchMove) {
+            this._touchTime = 0;
+        }
+
+        if(this._pressed){
+            if(!Vec3.equals(this.position, this.node.getPosition())) this._pressed = false;
+            if(this._touchTime > 1) this._onTouchEnded();
+        }
+
+        this.position = this.node.getPosition();
+
         const target = this.target;
         if (this._transitionFinished || !target) {
             return;
@@ -686,7 +746,7 @@ export class Button extends Component {
         this._transitionFinished = true;
     }
 
-    protected _registerNodeEvent () {
+    public _registerNodeEvent () {
         this.node.on(NodeEventType.TOUCH_START, this._onTouchBegan, this);
         this.node.on(NodeEventType.TOUCH_MOVE, this._onTouchMove, this);
         this.node.on(NodeEventType.TOUCH_END, this._onTouchEnded, this);
@@ -858,12 +918,20 @@ export class Button extends Component {
             this._applyTransition(state);
         }
 
+        const distance = Vec3.distance(new Vec3(event.getUIStartLocation().x , event.getUIStartLocation().y), new Vec3(event.getUILocation().x , event.getUILocation().y));
+
+        if (distance > 2) {
+            this._touchMove = true;
+        }
+
         if (event) {
             event.propagationStopped = true;
         }
     }
 
     protected _onTouchEnded (event?: EventTouch) {
+        this._touchMove = false;
+
         if (!this._interactable || !this.enabledInHierarchy) {
             return;
         }
@@ -881,6 +949,8 @@ export class Button extends Component {
     }
 
     protected _onTouchCancel (event?: EventTouch) {
+        this._touchMove = false;
+
         if (!this._interactable || !this.enabledInHierarchy) { return; }
 
         this._pressed = false;
@@ -910,7 +980,7 @@ export class Button extends Component {
         this._applyTransition(state);
     }
 
-    protected _getButtonState () {
+    public _getButtonState () {
         let state = State.NORMAL;
         if (!this._interactable) {
             state = State.DISABLED;
@@ -952,7 +1022,7 @@ export class Button extends Component {
             return;
         }
 
-        if (state === State.PRESSED) {
+        if (state === State.PRESSED || state === State.HOVER) {
             this._zoomUp();
         } else {
             this._zoomBack();
@@ -989,6 +1059,25 @@ export class Button extends Component {
         } else if (transition === Transition.SCALE) {
             this._updateScaleTransition(state);
         }
+
+        if(!this._childColorChange) return;
+
+        this.updateChildColor(state, this.node);
+    }
+
+    private updateChildColor(state: string, node: Node){
+        for(let i = 0 ; i < node.children.length; i++) {
+            const render =  node.children[i].getComponent(Renderable2D);
+            if(render == null) continue;
+            if(state == State.NORMAL || state == State.HOVER) {render.color = Color.WHITE;}
+            else if(state == State.PRESSED || state == State.DISABLED) { render.color = Color.GRAY;}
+        }
+
+		if (node.children.length == 0 || !this._childLoop) return;
+
+		for (var i = 0; i < node.children.length; i++) {
+			this.updateChildColor(state, node.children[i]);
+		}
     }
 
     private _xrHoverEnter() {

@@ -302,6 +302,46 @@ class LayerEval {
     }
 
     public update (deltaTime: number) {
+        if(this.isFinish){
+            this.isFinish = false;
+
+            const {
+                _currentTransitionPath: currentTransitionPath,
+                _currentTransitionToNode: currentTransitionToNode,
+            } = this;
+
+            assertIsNonNullable(currentTransitionPath.length > 0);
+            assertIsNonNullable(currentTransitionToNode);
+
+            const fromNode = this._currentNode;
+            const toNode = currentTransitionToNode;
+
+            this._callExitMethods(fromNode);
+
+            // Exiting overrides the updating
+            // Processed below.
+            // this._fromUpdated = false;
+            const { _currentTransitionPath: transitions } = this;
+            const nTransition = transitions.length;
+            for (let iTransition = 0; iTransition < nTransition; ++iTransition) {
+                const { to } = transitions[iTransition];
+                if (to.kind === NodeKind.exit) {
+                    this._callExitMethods(to);
+                }
+            }
+            this._fromUpdated = this._toUpdated;
+            this._toUpdated = false;
+            if (toNode.kind === NodeKind.animation) {
+                toNode.finishTransition();
+            }
+            this._currentNode = toNode;
+            this._currentTransitionToNode = null;
+            this._currentTransitionPath.length = 0;
+            // Make sure we won't suffer from precision problem
+            this._fromWeight = 1.0;
+            this._toWeight = 0.0;
+        }
+
         if (!this.exited) {
             this._fromWeight = 1.0;
             this._toWeight = 0.0;
@@ -589,13 +629,15 @@ class LayerEval {
                     continueNextIterationForce = true;
                     continue;
                 }
-
                 const currentUpdatingConsume = this._updateCurrentTransition(remainTimePiece);
                 if (GRAPH_DEBUG_ENABLED) {
                     passConsumed = currentUpdatingConsume;
                 }
                 remainTimePiece -= currentUpdatingConsume;
                 if (this._currentNode.kind === NodeKind.exit) {
+                    break;
+                }
+                if(this.isFinish){
                     break;
                 }
                 if (this._currentTransitionPath.length === 0) {
@@ -975,7 +1017,7 @@ class LayerEval {
         }
         this._callEnterMethods(targetNode);
     }
-
+     isFinish = false;
     /**
      * Update current transition.
      * Asserts: `!!this._currentTransition`.
@@ -1047,6 +1089,7 @@ class LayerEval {
         graphDebugGroupEnd();
 
         if (hasFinished) {
+            this.isFinish = true;
             // Transition done.
             graphDebug(`[SubStateMachine ${this.name}]: Transition finished:  ${fromNode.name} -> ${toNodeName}.`);
             this._finishCurrentTransition();

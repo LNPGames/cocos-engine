@@ -234,7 +234,7 @@ export class Skeleton extends UIRenderer {
     }
     set animation (value: string) {
         if (value) {
-            this.setAnimation(0, value, this.loop);
+            this.setAnimation(0, value, this.loop, this.reverse);
             this.markForUpdateRenderData();
         } else if (!this.isAnimationCached()) {
             this.clearTrack(0);
@@ -384,6 +384,19 @@ export class Skeleton extends UIRenderer {
             this._timeScale = value;
         }
     }
+
+    /**
+    * @en The _reverse of this skeleton.
+    * @zh 当前骨骼中所有动画的时间缩放率。
+    */
+   @tooltip('i18n:COMPONENT.skeleton._reverse')
+   @editable
+   get reverse () { return this._reverse; }
+   set reverse (value) {
+       if (value !== this._reverse) {
+           this._reverse = value;
+       }
+   }
 
     /**
      * @en Indicates whether open debug slots.
@@ -569,6 +582,9 @@ export class Skeleton extends UIRenderer {
     @serializable
     protected _skeletonData: SkeletonData | null = null;
 
+    @serializable
+    protected _reverse: boolean = false;
+
     /**
      * @en Indicates whether to enable premultiplied alpha.
      * You should disable this option when image's transparent area appears to have opaque pixels,
@@ -725,6 +741,8 @@ export class Skeleton extends UIRenderer {
 
     // IMPLEMENT
     public __preload () {
+        if (this._skeleton != null) return;
+
         super.__preload();
         if (EDITOR && !legacyCC.GAME_VIEW) {
             const Flags = CCObject.Flags;
@@ -804,7 +822,7 @@ export class Skeleton extends UIRenderer {
                 if (this._accTime > this._headAniInfo.delay) {
                     const aniInfo = this._headAniInfo;
                     this._headAniInfo = null;
-                    this.setAnimation(0, aniInfo.animationName, aniInfo.loop);
+                    this.setAnimation(0, aniInfo.animationName, aniInfo.loop, false);
                 }
                 return;
             }
@@ -1036,7 +1054,11 @@ export class Skeleton extends UIRenderer {
      * @param {Boolean} loop
      * @return {sp.spine.TrackEntry}
      */
-    public setAnimation (trackIndex: number, name: string, loop: boolean) {
+    public setAnimation (trackIndex: number, name: string, loop: boolean, reverse : boolean = false) {
+        if (this._skeleton == null){
+            this.__preload();
+        }
+
         this._playTimes = loop ? 0 : 1;
         this._animationName = name;
 
@@ -1066,7 +1088,7 @@ export class Skeleton extends UIRenderer {
                 logID(7509, name);
                 return null;
             }
-            const res = this._state!.setAnimationWith(trackIndex, animation, loop);
+            const res = this._state!.setAnimationWith(trackIndex, animation, loop, reverse);
             this._state!.apply(this._skeleton);
             return res;
         }
