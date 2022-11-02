@@ -1048,6 +1048,7 @@ class LayerEval {
         if (hasFinished) {
             // Transition done.
             graphDebug(`[SubStateMachine ${this.name}]: Transition finished:  ${fromNode.name} -> ${toNodeName}.`);
+            this._sample();
             this._finishCurrentTransition();
         }
 
