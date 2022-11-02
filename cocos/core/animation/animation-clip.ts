@@ -1384,6 +1384,7 @@ class EventEvaluator {
         }
     }
 
+    checkEventDuplicate : boolean = false;
     public sample (ratio: number, direction: number, iterations: number) {
         const length = this._eventGroups.length;
         let eventIndex = getEventGroupIndexAtRatio(ratio, this._ratios);
@@ -1431,7 +1432,7 @@ class EventEvaluator {
                             lastIndex = length;
                         }
                         lastIterations++;
-                    } else if (direction === 1 && lastIndex === length - 1 && eventIndex < length - 1) {
+                    } else if (direction === 1 && lastIndex === length - 1 && eventIndex < 0) {
                         if ((wrapMode & WrapModeMask.PingPong) === WrapModeMask.PingPong) {
                             direction *= -1;
                         } else {
@@ -1449,7 +1450,7 @@ class EventEvaluator {
                 }
 
                 lastIndex += direction;
-                this._doFire(lastIndex, true);
+                this._doFire(eventIndex, true);
             } while (lastIndex !== eventIndex && lastIndex > -1 && lastIndex < length);
         }
 
