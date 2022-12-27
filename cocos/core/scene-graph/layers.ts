@@ -34,6 +34,32 @@ import { Settings, settings } from '../settings';
 // built-in layers, users can use 0~19 bits, 20~31 are system preserve bits.
 const layerList = {
     NONE: 0,
+
+    //FIX LAYER
+    ZERO : (1 << 0),
+    ONE : (1 << 1),
+    TWO : (1 << 2),
+    THREE : (1 << 3),
+    FOUR : (1 << 4),
+    FIVE : (1 << 5),
+
+    //FREE LAYER
+    SIX : (1 << 6),
+    SEVEN : (1 << 7),
+    EIGHT : (1 << 8),
+    NINE : (1 << 9),
+    TEN : (1 << 10),
+    ELEVEN : (1 << 11),
+    TWELVE : (1 << 12),
+    THIRTEEN : (1 << 13),
+    FOURTEEN : (1 << 14),
+    FIFTHEEN : (1 << 15),
+    SIXTHEEN : (1 << 16),
+    SEVENTHEEN : (1 << 17),
+    EIGHTEEN : (1 << 18),
+
+    //FIX LAYER
+    INGAME_UI : (1 << 19),
     IGNORE_RAYCAST: (1 << 20),
     GIZMOS: (1 << 21),
     EDITOR: (1 << 22),
@@ -124,6 +150,10 @@ export class Layers {
         }
         if (bitNum > 19 || bitNum < 0) {
             console.warn('maximum layers reached.');
+            return;
+        }
+        if(Layers.Enum[name] !== undefined){
+            console.warn('already exits layer.');
             return;
         }
         const val = 1 << bitNum;
